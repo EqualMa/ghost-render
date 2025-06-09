@@ -1,0 +1,36 @@
+{
+  "name": "@ghost-render/ghost",
+  "version": "0.1.0",
+  "dependencies": {
+    "@types/node": "^22.15.30",
+    "ghost": "5.121.0"
+  },
+  "peerDependencies": {
+    "luxon": "^3.6.1",
+    "handlebars": "^4.7.8",
+    "@tryghost/color-utils": "^0.2.6",
+    "@tryghost/html-to-plaintext": "^1.0.4",
+    "@tryghost/kg-default-cards": "^10.1.3",
+    "@tryghost/i18n": "*"
+  },
+  "peerDependenciesMeta": {
+    "luxon": {
+      "optional": true
+    },
+    "handlebars": {
+      "optional": true
+    },
+    "@tryghost/color-utils": {
+      "optional": true
+    },
+    "@tryghost/html-to-plaintext": {
+      "optional": true
+    },
+    "@tryghost/kg-default-cards": {
+      "optional": true
+    },
+    "@tryghost/i18n": {
+      "optional": true
+    }
+  }
+}

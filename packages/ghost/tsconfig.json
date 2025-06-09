@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base",
+  "compilerOptions": {
+    // "skipLibCheck": false,
+    // "checkJs": true,
+    "allowJs": true,
+    "maxNodeModuleJsDepth": 1
+  },
+  "include": ["src", "*.ts", "vite-config"]
+}

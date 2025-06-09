@@ -1,0 +1,1201 @@
+diff --git a/core/server/api/endpoints/utils/serializers/output/utils/url.d.ts b/core/server/api/endpoints/utils/serializers/output/utils/url.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..426ead57bf22bac628cc93e97ef511baa5b3bb61
+--- /dev/null
++++ b/core/server/api/endpoints/utils/serializers/output/utils/url.d.ts
+@@ -0,0 +1,7 @@
++export const forPost: {
++  (
++    id: string,
++    attrs: object,
++    frame: { options: { columns?: undefined } }
++  ): asserts attrs is { url: string };
++};
+diff --git a/core/server/models/index.d.ts b/core/server/models/index.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..437fa010da76a908550724e70fe81ef7fe23575f
+--- /dev/null
++++ b/core/server/models/index.d.ts
+@@ -0,0 +1 @@
++export const Post: unknown;
+diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..b529837f5a3e35ace72e2219412df9d24b58ec92 100644
+--- a/core/server/services/email-service/EmailRenderer.js
++++ b/core/server/services/email-service/EmailRenderer.js
+@@ -1,20 +1,16 @@
++// @ts-check
++
++/**
++ * @import {TemplateData, LatestPost, TitleWeight, TitleStrongWeight, ButtonBorderRadius} from "./EmailRendererTypes"
++ */
++
+ /* eslint-disable no-unused-vars */
+ /* eslint-disable no-shadow */
+ 
+-const logging = require('@tryghost/logging');
+-const fs = require('fs').promises;
+-const path = require('path');
+-const {isUnsplashImage} = require('@tryghost/kg-default-cards/lib/utils');
+-const {textColorForBackgroundColor, darkenToContrastThreshold} = require('@tryghost/color-utils');
+-const {DateTime} = require('luxon');
+-const htmlToPlaintext = require('@tryghost/html-to-plaintext');
+-const EmailAddressParser = require('../email-address/EmailAddressParser');
+-const {registerHelpers} = require('./helpers/register-helpers');
+-const crypto = require('crypto');
+-
+ const DEFAULT_LOCALE = 'en-gb';
+ 
+ // Wrapper function so that i18next-parser can find these strings
++/** @type {<T>(x: T) => T} */
+ const t = (x) => {
+     return x;
+ };
+@@ -31,6 +27,10 @@ const messages = {
+     }
+ };
+ 
++/**
++ * @param {string} unsafe
++ * @returns {string}
++ */
+ function escapeHtml(unsafe) {
+     return unsafe
+         .replace(/&/g, '&amp;')
+@@ -40,38 +40,89 @@ function escapeHtml(unsafe) {
+         .replace(/'/g, '&#039;');
+ }
+ 
+-function isValidLocale(locale) {
+-    try {
+-        // Attempt to create a DateTimeFormat with the locale
+-        new Intl.DateTimeFormat(locale);
+-        return true; // No error means it's a valid locale
+-    } catch (e) {
+-        return false; // RangeError means invalid locale
+-    }
+-}
+-
+-function formatDateLong(date, timezone, locale = DEFAULT_LOCALE) {
+-    return DateTime.fromJSDate(date).setZone(timezone).setLocale(locale).toLocaleString({
+-        year: 'numeric',
+-        month: 'long',
+-        day: 'numeric'
+-    });
+-}
+-
++/**
++ * @param {string} string
++ * @returns {string}
++ */
+ function escapeRegExp(string) {
+     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+ }
+ 
+-// This aids with lazyloading the cheerio dependency
+-function cheerioLoad(html) {
+-    const cheerio = require('cheerio');
+-    return cheerio.load(html);
+-}
++const { load: cheerioLoad } = require('cheerio');
+ 
+ /**
+  * @typedef {string|null} Segment
+  * @typedef {object} Post
++ * @prop {string} id
++ * @prop {<K extends keyof PostKnownFields>(this: Post, field: K) => PostKnownFields[K]} get
++ * @prop {<K extends keyof PostKnownRelations>(this: Post, model: K) => PostKnownRelations[K]} related
++ * @prop {<K extends keyof PostKnownLazyRelations>(this: Post, model: K) => undefined | null | { models: PostKnownLazyRelations[K][] }} getLazyRelation
++ * @prop {(this: Post) => object} toJSON
++ *
++ * @typedef {object} PostKnownFields
++ * @prop {string | undefined | null} lexical
++ * @prop {string | undefined | null} mobiledoc
++ * @prop {string | undefined | null} visibility
++ * @prop {string | undefined | null} feature_image
++ * @prop {string} title
++ * @prop {string | undefined | null} custom_excerpt
++ * @prop {string | undefined | null} plaintext
++ * @prop {Date | undefined | null} published_at
++ *
++ * @typedef {object} PostKnownRelations
++ * @prop {PostsMeta} posts_meta
++ *
++ * @typedef {object} PostKnownLazyRelations
++ * @prop {Author} authors
++ *
++ * @typedef {object} Author
++ * @prop {(_: 'name') => string} get
++ *
++ * @typedef {object} PostsMeta
++ * @prop {<K extends keyof PostsMetaKnownFields>(this: PostsMeta, key: K) => PostsMetaKnownFields[K]} get
++ *
++ * @typedef {object} PostsMetaKnownFields
++ * @prop {string | undefined | null} email_subject
++ * @prop {boolean} email_only
++ * @prop {string | undefined | null} feature_image_alt
++ * @prop {string | undefined | null} feature_image_caption
++ *
+  * @typedef {object} Newsletter
++ * @prop {<K extends keyof NewsletterKnownFields>(this: Newsletter, field: K) => NewsletterKnownFields[K]} get
++ *
++ * @typedef {object} NewsletterKnownFields
++ * @prop {string | undefined | null} sender_reply_to
++ * @prop {string | undefined | null} button_corners
++ * @prop {string | undefined | null} button_style
++ * @prop {'normal' | 'medium' | 'semibold' | 'bold' | (string & {}) | null} title_font_weight
++ * @prop {string | undefined | null} link_style
++ * @prop {string | undefined | null} image_corners
++ * @prop {'accent' | 'auto' | (string & {}) | null} post_title_color
++ * @prop {'accent' | 'auto' | (string & {}) | null} section_title_color
++ * @prop {string} uuid
++ * @prop {'light' | 'dark' | (string & {}) | null} background_color
++ * @prop {string} sender_name
++ * @prop {string} sender_email
++ * @prop {string | undefined | null} divider_color
++ * @prop {string | undefined | null} header_image
++ * @prop {boolean} show_latest_posts
++ *
++ * @prop {string | undefined | null} title_alignment
++ * @prop {string | undefined | null} body_font_category
++ * @prop {string | undefined | null} title_font_category
++ * @prop {string} name
++ * @prop {boolean} show_post_title_section
++ * @prop {boolean} show_excerpt
++ * @prop {boolean} show_comment_cta
++ * @prop {boolean} show_subscription_details
++ * @prop {boolean | undefined | null} feedback_enabled
++ * @prop {boolean} show_badge
++ * @prop {boolean} show_header_icon
++ * @prop {boolean} show_header_title
++ * @prop {boolean} show_header_name
++ * @prop {boolean} show_feature_image
++ * @prop {string | undefined | null} footer_content
++ * @prop {boolean} show_feature_image
+  */
+ 
+ /**
+@@ -115,7 +166,205 @@ function cheerioLoad(html) {
+  * @prop {ReplacementDefinition[]} replacements
+  */
+ 
++/**
++ * @typedef {object} Imports
++ * @prop {ImportsLogging} logging
++ * @prop {(href: string) => boolean} isUnsplashImage
++ * @prop {(backgroundColor: string) => ImportsReturnedColor} textColorForBackgroundColor
++ * @prop {(accentColor: string, _arg1: '#ffffff', _arg2: 2) => ImportsReturnedColor} darkenToContrastThreshold
++ * @prop {(date: Date, timezone: string, locale: string) => string} formatDateLong
++ * @prop {(publishedAt: Date | null | undefined, timezone: string, locale: string) => string} formatPostPublishedAt
++ * @prop {(html: string) => string} htmlToPlaintext_email
++ * @prop {(from: EmailAddress) => string} EmailAddressParser_stringify
++ * @prop {(getMembersValidationKeyFromSettingsHelpers: () => string, memberUuid: string) => string} createKeyForMember
++ * @prop {(locale: string) => boolean} isValidLocale
++ * @prop {(deps: ImportsMakeRenderTemplateDeps) => ImportsRenderTemplate} makeRenderTemplate
++ */
++
++/**
++ * @typedef {object} ImportsLogging
++ * @prop {(msg: unknown) => void} warn
++ * @prop {(msg: unknown) => void} error
++ */
++
++/**
++ * @typedef {object} ImportsReturnedColor
++ * @prop {(this: ImportsReturnedColor) => string} hex
++ * @prop {(this: ImportsReturnedColor, alpha: number) => ImportsReturnedColor} alpha
++ * @prop {(this: ImportsReturnedColor) => string} toString
++ */
++
++/**
++ * @typedef {object} ImportsMakeRenderTemplateDeps
++ * @prop {DependenciesLabs} labs
++ * @prop {DependenciesT} t
++ */
++
++/**
++ * @typedef {(templateData: TemplateData) => string | Promise<string>} ImportsRenderTemplate
++ */
++
++/**
++ * @typedef {object} DependenciesSettingsCache
++ * @prop {(this: DependenciesSettingsCache, key: DependenciesSettingsCacheKnownField) => string} get
++ */
++
++/**
++ * @typedef {object} DependenciesSettingsHelpers
++ * @prop {(this: DependenciesSettingsHelpers) => string} getNoReplyAddress
++ * @prop {(this: DependenciesSettingsHelpers) => string} getMembersSupportAddress
++ * @prop {(this: DependenciesSettingsHelpers) => string} getMembersValidationKey
++ * @prop {(this: DependenciesSettingsHelpers, uuid: string, options: DependenciesSettingsHelpersCreateUnsubscribeUrlOptions) => string} createUnsubscribeUrl
++ */
++
++/**
++ * @typedef {object} DependenciesSettingsHelpersCreateUnsubscribeUrlOptions
++ * @prop {string} newsletterUuid
++ */
++
++/**
++ * @typedef {'title'
++ *  | 'locale'
++ *  | 'timezone'
++ *  | 'accent_color'
++ *  | 'icon'
++ *  | 'comments_enabled'
++ * } DependenciesSettingsCacheKnownField
++ */
++
++/**
++ * @typedef {object} DependenciesUrlUtils
++ * @prop {DependenciesUrlUtilsUrlFor} urlFor
++ * @prop {(url: URL) => boolean} isSiteUrl
++ */
++
++/**
++ * @typedef {object} DependenciesLinkReplacer
++ * @prop {(
++ *          html: string,
++ *          replacer: (url: URL, originalPath: string) => string | URL | Promise<string | URL>,
++ *          options: { base: string },
++ *      ) => string | Promise<string>} replace
++ */
++
++/**
++ * @typedef {object} DependenciesLinkTracking
++ * @prop {DependenciesLinkTrackingService} service
++ */
++
++/**
++ * @typedef {object} DependenciesMemberAttributionService
++ * @prop {(this: DependenciesMemberAttributionService, url: URL, post: Post) => URL} addPostAttributionTracking
++ */
++
++/**
++ * @typedef {object} DependenciesAudienceFeedbackService
++ * @prop {(
++ *      this: DependenciesAudienceFeedbackService,
++ *      _uuid: '--uuid--',
++ *      postId: string,
++ *      _: 1 | 0,
++ *      _key: '--key--',
++ *  ) => { href: string }
++ * } buildLink
++ */
++
++/**
++ * @typedef {object} DependenciesEmailAddressService
++ * @prop {(
++ *      this: DependenciesEmailAddressService,
++ *      options: {
++ *          from: EmailAddress;
++ *          replyTo?: { address: string | undefined | null; };
++ *      },
++ * ) => { from: EmailAddress, replyTo?: EmailAddress }
++ * } getAddress
++ * @prop {boolean} managedEmailEnabled
++ */
++
++/**
++ * @typedef {object} EmailAddress
++ * @prop {string} address
++ * @prop {string | undefined} name
++ */
++
++/**
++ * @typedef {object} DependenciesOutboundLinkTagger
++ * @prop {(url: URL, newsletter?: Newsletter) => URL} addToUrl
++ */
++
++/**
++ * @typedef {object} DependenciesLinkTrackingService
++ * @prop {(url: URL, post: Post, _: '--uuid--') => URL | Promise<URL>} addTrackingToUrl
++ */
++
++/**
++ * @typedef {(
++ *  ...args:
++ *      | [type: "home", absolute: true]
++ *      | [type: "image", options: { image: string }, absolute: true]
++ * ) => string} DependenciesUrlUtilsUrlFor
++ */
++
++/**
++ * @typedef {(options: DependenciesMakeTDependencies) => DependenciesT} DependenciesMakeT
++ */
++
++/**
++ * @typedef {object} DependenciesMakeTDependencies
++ * @prop {DependenciesLabs} labs
++ * @prop {DependenciesSettingsCache} settingsCache
++ */
++
++/**
++ * @typedef {(key: string, options?: unknown) => string} DependenciesT
++ */
++
++/**
++ * @typedef {object} DependenciesLabs
++ * @prop {(this: DependenciesLabs, key: DependenciesLabsKnownKey| (string & {})) => boolean} isSet
++ */
++
++/**
++ * @typedef {object} DependenciesModelsPost
++ * @prop {(options: {
++ *      filter: `status:published+id:-'${string}'`,
++ *      order: 'published_at DESC',
++ *      limit: 3,
++ *  }) => Promise<{ data: Post[] }>
++ * } findPage
++ */
++
++/**
++ * @typedef {'i18n'
++ *  | 'emailCustomization'
++ *  | 'emailCustomizationAlpha'
++ *  | 'contentVisibility'
++ * } DependenciesLabsKnownKey
++ */
++
+ class EmailRenderer {
++    /** @type {Imports["logging"]} */
++    #import_logging
++    /** @type {Imports["isUnsplashImage"]} */
++    #import_isUnsplashImage
++    /** @type {Imports["textColorForBackgroundColor"]} */
++    #import_textColorForBackgroundColor
++    /** @type {Imports["darkenToContrastThreshold"]} */
++    #import_darkenToContrastThreshold
++    /** @type {Imports["formatDateLong"]} */
++    #import_formatDateLong
++    /** @type {Imports["formatPostPublishedAt"]} */
++    #import_formatPostPublishedAt
++    /** @type {Imports["htmlToPlaintext_email"]} */
++    #import_htmlToPlaintext_email
++    /** @type {Imports["EmailAddressParser_stringify"]} */
++    #import_EmailAddressParser_stringify
++    /** @type {Imports["createKeyForMember"]} */
++    #import_createKeyForMember
++    /** @type {Imports["isValidLocale"]} */
++    #import_isValidLocale
++
+     #settingsCache;
+     #settingsHelpers;
+ 
+@@ -126,7 +375,6 @@ class EmailRenderer {
+     #getPostUrl;
+     #storageUtils;
+ 
+-    #handlebars;
+     #renderTemplate;
+     #linkReplacer;
+     #linkTracking;
+@@ -140,26 +388,28 @@ class EmailRenderer {
+ 
+     /**
+      * @param {object} dependencies
+-     * @param {object} dependencies.settingsCache
+-     * @param {{getNoReplyAddress(): string, getMembersSupportAddress(): string, getMembersValidationKey(): string, createUnsubscribeUrl(uuid: string, options: object): string}} dependencies.settingsHelpers
++     * @param {Imports} dependencies.imports
++     * @param {DependenciesSettingsCache} dependencies.settingsCache
++     * @param {DependenciesSettingsHelpers} dependencies.settingsHelpers
+      * @param {object} dependencies.renderers
+-     * @param {{render(object, options): string}} dependencies.renderers.lexical
+-     * @param {{render(object, options): string}} dependencies.renderers.mobiledoc
++     * @param {{render(lexical: string, options: {target: 'email', postUrl: string, design?: unknown}): string | Promise<string>}} dependencies.renderers.lexical
++     * @param {{render(object: unknown, options: {target: 'email', postUrl: string}): string}} dependencies.renderers.mobiledoc
+      * @param {{getImageSizeFromUrl(url: string): Promise<{width: number, height: number}>}} dependencies.imageSize
+-     * @param {{urlFor(type: string, optionsOrAbsolute, absolute): string, isSiteUrl(url, context): boolean}} dependencies.urlUtils
++     * @param {DependenciesUrlUtils} dependencies.urlUtils
+      * @param {{isLocalImage(url: string): boolean}} dependencies.storageUtils
+      * @param {(post: Post) => string} dependencies.getPostUrl
+-     * @param {object} dependencies.linkReplacer
+-     * @param {object} dependencies.linkTracking
+-     * @param {object} dependencies.memberAttributionService
+-     * @param {object} dependencies.audienceFeedbackService
+-     * @param {object} dependencies.emailAddressService
+-     * @param {object} dependencies.outboundLinkTagger
+-     * @param {object} dependencies.labs
+-     * @param {{Post: object}} dependencies.models
+-     * @param {Function} dependencies.t
++     * @param {DependenciesLinkReplacer} dependencies.linkReplacer
++     * @param {DependenciesLinkTracking} dependencies.linkTracking
++     * @param {DependenciesMemberAttributionService} dependencies.memberAttributionService
++     * @param {DependenciesAudienceFeedbackService} dependencies.audienceFeedbackService
++     * @param {DependenciesEmailAddressService} dependencies.emailAddressService
++     * @param {DependenciesOutboundLinkTagger} dependencies.outboundLinkTagger
++     * @param {DependenciesLabs} dependencies.labs
++     * @param {{Post: DependenciesModelsPost}} dependencies.models
++     * @param {DependenciesMakeT} dependencies.makeT
+      */
+     constructor({
++        imports,
+         settingsCache,
+         settingsHelpers,
+         renderers,
+@@ -175,8 +425,10 @@ class EmailRenderer {
+         outboundLinkTagger,
+         labs,
+         models,
+-        t
++        makeT
+     }) {
++        const t = makeT({ labs, settingsCache });
++
+         this.#settingsCache = settingsCache;
+         this.#settingsHelpers = settingsHelpers;
+         this.#renderers = renderers;
+@@ -193,14 +445,38 @@ class EmailRenderer {
+         this.#labs = labs;
+         this.#models = models;
+         this.#t = t;
++
++        this.#import_logging = imports.logging;
++        this.#import_isUnsplashImage = imports.isUnsplashImage;
++        this.#import_textColorForBackgroundColor = imports.textColorForBackgroundColor;
++        this.#import_darkenToContrastThreshold = imports.darkenToContrastThreshold;
++        this.#import_formatDateLong = imports.formatDateLong;
++        this.#import_formatPostPublishedAt = imports.formatPostPublishedAt;
++        this.#import_htmlToPlaintext_email = imports.htmlToPlaintext_email;
++        this.#import_EmailAddressParser_stringify = imports.EmailAddressParser_stringify;
++        this.#import_createKeyForMember = imports.createKeyForMember;
++        this.#import_isValidLocale = imports.isValidLocale;
++
++        this.#renderTemplate = imports.makeRenderTemplate({ labs, t });
+     }
+ 
++    /**
++     * @param {Post} post
++     * @param {boolean=} isTestEmail
++     * @returns {string}
++     */
+     getSubject(post, isTestEmail = false) {
+         const subject = post.related('posts_meta')?.get('email_subject') || post.get('title');
+         return isTestEmail ? `[TEST] ${subject}` : subject;
+     }
+ 
++    /**
++     * @param {Post} post
++     * @param {Newsletter} newsletter
++     * @returns {EmailAddress}
++     */
+     #getRawFromAddress(post, newsletter) {
++        post; // noUnusedParameters
+         let senderName = this.#settingsCache.get('title') ? this.#settingsCache.get('title').replace(/"/g, '\\"') : '';
+         if (newsletter.get('sender_name')) {
+             senderName = newsletter.get('sender_name');
+@@ -215,7 +491,7 @@ class EmailRenderer {
+         if (process.env.NODE_ENV !== 'production') {
+             if (/@localhost$/.test(fromAddress) || /@ghost.local$/.test(fromAddress)) {
+                 const localAddress = 'localhost@example.com';
+-                logging.warn(`Rewriting bulk email from address ${fromAddress} to ${localAddress}`);
++                this.#import_logging.warn(`Rewriting bulk email from address ${fromAddress} to ${localAddress}`);
+                 fromAddress = localAddress;
+             }
+         }
+@@ -237,20 +513,25 @@ class EmailRenderer {
+         locale = locale.trim();
+ 
+         // If the locale is just "en", or is not valid, revert to default
+-        if (locale === 'en' || !isValidLocale(locale)) {
++        if (locale === 'en' || !this.#import_isValidLocale(locale)) {
+             locale = DEFAULT_LOCALE;
+         }
+ 
+         return locale;
+     }
+ 
++    /**
++     * @param {Post} post
++     * @param {Newsletter} newsletter
++     * @returns {string}
++     */
+     getFromAddress(post, newsletter) {
+         // Clean from address to ensure DMARC alignment
+         const addresses = this.#emailAddressService.getAddress({
+             from: this.#getRawFromAddress(post, newsletter)
+         });
+ 
+-        return EmailAddressParser.stringify(addresses.from);
++        return this.#import_EmailAddressParser_stringify(addresses.from);
+     }
+ 
+     /**
+@@ -275,7 +556,7 @@ class EmailRenderer {
+         });
+ 
+         if (addresses.replyTo) {
+-            return EmailAddressParser.stringify(addresses.replyTo);
++            return this.#import_EmailAddressParser_stringify(addresses.replyTo);
+         }
+         return null;
+     }
+@@ -314,9 +595,16 @@ class EmailRenderer {
+         return allowedSegments;
+     }
+ 
++    /**
++     *
++     * @param {Post} post
++     * @param {Newsletter} [newsletter]
++     * @returns {Promise<string>}
++     */
+     async renderPostBaseHtml(post, newsletter) {
+         const postUrl = this.#getPostUrl(post);
+ 
++        /** @type {{target: 'email', postUrl: string, design?: object}} */
+         const renderOptions = {
+             target: 'email',
+             postUrl
+@@ -360,12 +648,17 @@ class EmailRenderer {
+         if (post.get('lexical')) {
+             // only lexical's renderer is async
+             html = await this.#renderers.lexical.render(
+-                post.get('lexical'),
++                /** @type {string} */
++                (post.get('lexical')),
+                 renderOptions
+             );
+         } else {
+             html = this.#renderers.mobiledoc.render(
+-                JSON.parse(post.get('mobiledoc')), {target: 'email', postUrl}
++                JSON.parse(
++                    /** @type {string} */
++                    (post.get('mobiledoc'))
++                ),
++                {target: 'email', postUrl}
+             );
+         }
+         return html;
+@@ -507,7 +800,7 @@ class EmailRenderer {
+         });
+ 
+         // Add a class to each figcaption so we can style them in the email
+-        $('figcaption').each((i, elem) => !!($(elem).addClass('kg-card-figcaption')));
++        $('figcaption').each((_i, elem) => !!($(elem).addClass('kg-card-figcaption')));
+         html = $.html();
+ 
+         // Juice HTML (inline CSS)
+@@ -536,15 +829,15 @@ class EmailRenderer {
+         $('a').attr('target', '_blank');
+ 
+         // convert figure and figcaption to div so that Outlook applies margins
+-        $('figure, figcaption').each((i, elem) => !!(elem.tagName = 'div'));
++        $('figure, figcaption').each((_i, elem) => !!(elem.tagName = 'div'));
+ 
+         // Remove duplicate black/white images (CSS based solution not working in Outlook)
+         if (templateData.backgroundIsDark) {
+-            $('img.is-light-background').each((i, elem) => {
++            $('img.is-light-background').each((_i, elem) => {
+                 $(elem).remove();
+             });
+         } else {
+-            $('img.is-dark-background').each((i, elem) => {
++            $('img.is-dark-background').each((_i, elem) => {
+                 $(elem).remove();
+             });
+         }
+@@ -558,7 +851,7 @@ class EmailRenderer {
+         // TODO: normalizeReplacementStrings (replace unsupported replacement strings)
+ 
+         // Convert HTML to plaintext
+-        const plaintext = htmlToPlaintext.email(html);
++        const plaintext = this.#import_htmlToPlaintext_email(html);
+ 
+         // Fix any unsupported chars in Outlook
+         html = html.replace(/&apos;/g, '&#39;');
+@@ -580,12 +873,11 @@ class EmailRenderer {
+      * Takes a member and newsletter uuid. Returns the url that should be used to unsubscribe
+      * In case of no member uuid, generates the preview unsubscribe url - `?preview=1`
+      *
+-     * @param {string} [uuid] member uuid
+-     * @param {Object} [options]
+-     * @param {string} [options.newsletterUuid] newsletter uuid
+-     * @param {boolean} [options.comments] Unsubscribe from comment emails
++     * @param {string} uuid member uuid
++     * @param {Object} options
++     * @param {string} options.newsletterUuid newsletter uuid
+      */
+-    createUnsubscribeUrl(uuid, options = {}) {
++    #createUnsubscribeUrl(uuid, options) {
+         return this.#settingsHelpers.createUnsubscribeUrl(uuid, options);
+     }
+ 
+@@ -595,6 +887,7 @@ class EmailRenderer {
+      * @param {string} [uuid] member uuid
+      */
+     createManageAccountUrl(uuid) {
++        uuid; // noUnusedParameters
+         const siteUrl = this.#urlUtils.urlFor('home', true);
+         const url = new URL(siteUrl);
+         url.hash = '#/portal/account';
+@@ -604,6 +897,8 @@ class EmailRenderer {
+ 
+     /**
+      * Returns whether a paid member is trialing a subscription
++     * @param {MemberLike} member
++     * @returns {boolean}
+      */
+     isMemberTrialing(member) {
+         // Do we have an active subscription?
+@@ -666,11 +961,11 @@ class EmailRenderer {
+             const timezone = this.#settingsCache.get('timezone');
+             // Translate to a human readable string
+             if (activeSubscription.trial_end_at && activeSubscription.trial_end_at > new Date() && activeSubscription.status === 'trialing') {
+-                const date = formatDateLong(activeSubscription.trial_end_at, timezone, locale);
++                const date = this.#import_formatDateLong(activeSubscription.trial_end_at, timezone, locale);
+                 return t(messages.subscriptionStatus.trial, {date});
+             }
+ 
+-            const date = formatDateLong(activeSubscription.current_period_end, timezone, locale);
++            const date = this.#import_formatDateLong(activeSubscription.current_period_end, timezone, locale);
+             if (activeSubscription.cancel_at_period_end) {
+                 return t(messages.subscriptionStatus.canceled, {date});
+             }
+@@ -681,7 +976,7 @@ class EmailRenderer {
+ 
+         if (expires) {
+             const timezone = this.#settingsCache.get('timezone');
+-            const date = formatDateLong(expires, timezone, locale);
++            const date = this.#import_formatDateLong(expires, timezone, locale);
+             return t(messages.subscriptionStatus.complimentaryExpires, {date});
+         }
+ 
+@@ -690,17 +985,21 @@ class EmailRenderer {
+ 
+     /**
+      * Note that we only look in HTML because plaintext and HTML are essentially the same content
++     * @param {object} options
++     * @param {string} options.html
++     * @param {string} options.newsletterUuid
+      * @returns {ReplacementDefinition[]}
+      */
+     buildReplacementDefinitions({html, newsletterUuid}) {
+         const t = this.#t; // es-lint-disable-line no-shadow
+         const locale = this.#getValidLocale();
+ 
++        /** @type {{ id: string; getValue: (member: MemberLike) => string, required?: true }[]} */
+         const baseDefinitions = [
+             {
+                 id: 'unsubscribe_url',
+                 getValue: (member) => {
+-                    return this.createUnsubscribeUrl(member.uuid, {newsletterUuid});
++                    return this.#createUnsubscribeUrl(member.uuid, {newsletterUuid});
+                 }
+             },
+             {
+@@ -718,7 +1017,10 @@ class EmailRenderer {
+             {
+                 id: 'key',
+                 getValue: (member) => {
+-                    return crypto.createHmac('sha256', this.#settingsHelpers.getMembersValidationKey()).update(member.uuid).digest('hex');
++                    return this.#import_createKeyForMember(
++                        () => this.#settingsHelpers.getMembersValidationKey(),
++                        member.uuid,
++                    );
+                 }
+             },
+             {
+@@ -749,7 +1051,7 @@ class EmailRenderer {
+                 id: 'created_at',
+                 getValue: (member) => {
+                     const timezone = this.#settingsCache.get('timezone');
+-                    return member.createdAt ? formatDateLong(member.createdAt, timezone, locale) : '';
++                    return member.createdAt ? this.#import_formatDateLong(member.createdAt, timezone, locale) : '';
+                 }
+             },
+             {
+@@ -776,7 +1078,7 @@ class EmailRenderer {
+             {
+                 id: 'list_unsubscribe',
+                 getValue: (member) => {
+-                    return this.createUnsubscribeUrl(member.uuid, {newsletterUuid});
++                    return this.#createUnsubscribeUrl(member.uuid, {newsletterUuid});
+                 },
+                 required: true // Used in email headers
+             }
+@@ -787,8 +1089,10 @@ class EmailRenderer {
+         const REPLACEMENT_STRING_REGEX = /^(?<recipientProperty>\w+?)(?:,? *(?:"|&quot;)(?<fallback>.*?)(?:"|&quot;))?$/;
+ 
+         // Stores the definitions that we are actually going to use
++        /** @type {(ReplacementDefinition & { originalId?: string })[]} */
+         const replacements = [];
+ 
++        /** @type {RegExpExecArray | null} */
+         let result;
+         while ((result = EMAIL_REPLACEMENT_REGEX.exec(html)) !== null) {
+             const [replacementMatch, replacementStr] = result;
+@@ -800,7 +1104,7 @@ class EmailRenderer {
+             const match = replacementStr.match(REPLACEMENT_STRING_REGEX);
+ 
+             if (match) {
+-                const {recipientProperty, fallback} = match.groups;
++                const {recipientProperty, fallback} = /** @type {Record<string, string>} */ (match.groups);
+                 const definition = baseDefinitions.find(d => d.id === recipientProperty);
+ 
+                 if (definition) {
+@@ -842,37 +1146,20 @@ class EmailRenderer {
+         return this.#labs;
+     }
+ 
+-    async renderTemplate(data) {
+-        const labs = this.getLabs();
+-        this.#handlebars = require('handlebars').create();
+-
+-        // Register helpers
+-        registerHelpers(this.#handlebars, labs, this.#t);
+-
+-        // Partials
+-        const cssPartialSource = await fs.readFile(path.join(__dirname, './email-templates/partials/', `styles.hbs`), 'utf8');
+-        this.#handlebars.registerPartial('styles', cssPartialSource);
+-
+-        const paywallPartial = await fs.readFile(path.join(__dirname, './email-templates/partials/', `paywall.hbs`), 'utf8');
+-        this.#handlebars.registerPartial('paywall', paywallPartial);
+-
+-        const feedbackButtonPartial = await fs.readFile(path.join(__dirname, './email-templates/partials/', `feedback-button.hbs`), 'utf8');
+-        this.#handlebars.registerPartial('feedbackButton', feedbackButtonPartial);
+-
+-        const latestPostsPartial = await fs.readFile(path.join(__dirname, './email-templates/partials/', `latest-posts.hbs`), 'utf8');
+-        this.#handlebars.registerPartial('latestPosts', latestPostsPartial);
+-
+-        // Actual template
+-        const htmlTemplateSource = await fs.readFile(path.join(__dirname, './email-templates/', `template.hbs`), 'utf8');
+-        this.#renderTemplate = this.#handlebars.compile(Buffer.from(htmlTemplateSource).toString());
+-
++    /**
++     * @param {TemplateData} data
++     * @returns {string | Promise<string>}
++     */
++    renderTemplate(data) {
+         return this.#renderTemplate(data);
+     }
+ 
+     /**
+      * Get email preheader text from post model
+-     * @param {object} postModel
+-     * @returns
++     * @param {Post} postModel
++     * @param {Segment} segment
++     * @param {string} html
++     * @returns {string}
+      */
+     #getEmailPreheader(postModel, segment, html) {
+         let plaintext = postModel.get('plaintext');
+@@ -885,7 +1172,7 @@ class EmailRenderer {
+                 // so we use the provided HTML to generate the plaintext as this
+                 // should have already had the paid content removed
+                 if (segment === 'status:free') {
+-                    plaintext = htmlToPlaintext.email(html);
++                    plaintext = this.#import_htmlToPlaintext_email(html);
+                 }
+                 return plaintext.substring(0, 500);
+             } else {
+@@ -894,6 +1181,11 @@ class EmailRenderer {
+         }
+     }
+ 
++    /**
++     * @param {string | undefined | null} text
++     * @param {number} maxLength
++     * @returns {string}
++     */
+     truncateText(text, maxLength) {
+         if (text && text.length > maxLength) {
+             return text.substring(0, maxLength - 1).trim() + '…';
+@@ -904,10 +1196,10 @@ class EmailRenderer {
+ 
+     /**
+      *
+-     * @param {*} text
++     * @param {string | undefined | null} text
+      * @param {number} maxLength
+      * @param {number} maxLengthMobile should be smaller than maxLength
+-     * @returns
++     * @returns {string}
+      */
+     truncateHtml(text, maxLength, maxLengthMobile) {
+         if (!maxLengthMobile || maxLength <= maxLengthMobile) {
+@@ -928,13 +1220,17 @@ class EmailRenderer {
+         }
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter
++     * @returns {string}
++     */
+     #getBackgroundColor(newsletter) {
+         /** @type {'light' | 'dark' | string | null} */
+         const value = newsletter.get('background_color');
+ 
+         const validHex = /#([0-9a-f]{3}){1,2}$/i;
+ 
+-        if (validHex.test(value)) {
++        if (value && validHex.test(value)) {
+             return value;
+         }
+ 
+@@ -946,13 +1242,18 @@ class EmailRenderer {
+         return '#ffffff';
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter
++     * @param {string} accentColor
++     * @returns {string}
++     */
+     #getPostTitleColor(newsletter, accentColor) {
+         /** @type {'accent' | 'auto' | string | null} */
+         const value = newsletter.get('post_title_color');
+ 
+         const validHex = /#([0-9a-f]{3}){1,2}$/i;
+ 
+-        if (validHex.test(value)) {
++        if (value && validHex.test(value)) {
+             return value;
+         }
+ 
+@@ -962,9 +1263,14 @@ class EmailRenderer {
+ 
+         // value === 'auto', value === null, value is not valid hex
+         const backgroundColor = this.#getBackgroundColor(newsletter);
+-        return textColorForBackgroundColor(backgroundColor).hex();
++        return this.#import_textColorForBackgroundColor(backgroundColor).hex();
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter
++     * @param {string} accentColor
++     * @returns {string | null}
++     */
+     #getSectionTitleColor(newsletter, accentColor) {
+         const labs = this.getLabs();
+         if (!labs?.isSet('emailCustomization') && !labs?.isSet('emailCustomizationAlpha')) {
+@@ -975,7 +1281,7 @@ class EmailRenderer {
+         const value = newsletter.get('section_title_color');
+         const validHex = /#([0-9a-f]{3}){1,2}$/i;
+ 
+-        if (validHex.test(value)) {
++        if (value && validHex.test(value)) {
+             return value;
+         }
+ 
+@@ -986,13 +1292,17 @@ class EmailRenderer {
+         return null;
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter
++     * @returns {TitleWeight}
++     */
+     #getTitleWeight(newsletter) {
+-        const weights = {
++        const weights = /** @type {const} */ ({
+             normal: '400',
+             medium: '500',
+             semibold: '600',
+             bold: '700'
+-        };
++        });
+ 
+         const labs = this.getLabs();
+         if (!labs?.isSet('emailCustomizationAlpha') && !labs?.isSet('emailCustomization')) {
+@@ -1002,9 +1312,13 @@ class EmailRenderer {
+         /** @type {'normal' | 'medium' | 'semibold' | 'bold' | string | null} */
+         const settingValue = newsletter.get('title_font_weight');
+ 
+-        return weights[settingValue] || weights.bold;
++        return weights[/** @type {keyof typeof weights} */(settingValue)] || weights.bold;
+     }
+ 
++    /**
++     * @param {TitleWeight} titleWeight
++     * @returns {TitleStrongWeight}
++     */
+     #getTitleStrongWeight(titleWeight) {
+         const numericWeight = parseInt(titleWeight, 10);
+ 
+@@ -1021,6 +1335,10 @@ class EmailRenderer {
+         }
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter
++     * @returns {boolean}
++     */
+     #getImageCorners(newsletter) {
+         const value = newsletter.get('image_corners');
+         if (value === 'rounded') {
+@@ -1029,6 +1347,10 @@ class EmailRenderer {
+         return false;
+     }
+ 
++    /**
++     * @param {Newsletter} [newsletter]
++     * @returns {string}
++     */
+     #getDividerColor(newsletter) {
+         const labs = this.getLabs();
+ 
+@@ -1038,7 +1360,7 @@ class EmailRenderer {
+ 
+             if (value === 'accent') {
+                 return this.#settingsCache.get('accent_color');
+-            } else if (validHex.test(value)) {
++            } else if (value && validHex.test(value)) {
+                 return value;
+             }
+         }
+@@ -1049,6 +1371,13 @@ class EmailRenderer {
+ 
+     /**
+      * @private
++     * @param {object} options
++     * @param {Post} options.post
++     * @param {Newsletter} options.newsletter
++     * @param {string} options.html
++     * @param {boolean} options.addPaywall
++     * @param {Segment} options.segment
++     * @returns {Promise<TemplateData>}
+      */
+     async getTemplateData({post, newsletter, html, addPaywall, segment}) {
+         const labs = this.getLabs();
+@@ -1057,27 +1386,28 @@ class EmailRenderer {
+         let adjustedAccentColor;
+         let adjustedAccentContrastColor;
+         try {
+-            adjustedAccentColor = accentColor && darkenToContrastThreshold(accentColor, '#ffffff', 2).hex();
+-            adjustedAccentContrastColor = accentColor && textColorForBackgroundColor(adjustedAccentColor).hex();
++            adjustedAccentColor = accentColor && this.#import_darkenToContrastThreshold(accentColor, '#ffffff', 2).hex();
++            adjustedAccentContrastColor = accentColor && this.#import_textColorForBackgroundColor(adjustedAccentColor).hex();
+         } catch (e) {
+-            logging.error(e);
++            this.#import_logging.error(e);
+             accentColor = '#15212A';
+         }
+ 
+         const hasAnyEmailCustomization = labs.isSet('emailCustomization') || labs.isSet('emailCustomizationAlpha');
+ 
+         const backgroundColor = this.#getBackgroundColor(newsletter);
+-        const backgroundIsDark = textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
++        const backgroundIsDark = this.#import_textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
+         const postTitleColor = this.#getPostTitleColor(newsletter, accentColor);
+         const titleWeight = this.#getTitleWeight(newsletter);
+         const titleStrongWeight = this.#getTitleStrongWeight(titleWeight);
+-        const textColor = textColorForBackgroundColor(backgroundColor).hex();
+-        const secondaryTextColor = textColorForBackgroundColor(backgroundColor).alpha(0.5).toString();
++        const textColor = this.#import_textColorForBackgroundColor(backgroundColor).hex();
++        const secondaryTextColor = this.#import_textColorForBackgroundColor(backgroundColor).alpha(0.5).toString();
+         const linkColor = backgroundIsDark ? '#ffffff' : accentColor;
+         const hasRoundedImageCorners = hasAnyEmailCustomization ? this.#getImageCorners(newsletter) : false;
+         const sectionTitleColor = hasAnyEmailCustomization ? this.#getSectionTitleColor(newsletter, accentColor) : null;
+         const dividerColor = this.#getDividerColor(newsletter);
+ 
++        /** @type {ButtonBorderRadius} */
+         let buttonBorderRadius = '6px';
+         if (hasAnyEmailCustomization) {
+             if (newsletter.get('button_corners') === 'square') {
+@@ -1094,12 +1424,9 @@ class EmailRenderer {
+ 
+         const timezone = this.#settingsCache.get('timezone');
+         const locale = this.#getValidLocale();
+-        const publishedAt = (post.get('published_at') ? DateTime.fromJSDate(post.get('published_at')) : DateTime.local()).setZone(timezone).setLocale(locale).toLocaleString({
+-            year: 'numeric',
+-            month: 'short',
+-            day: 'numeric'
+-        });
++        const publishedAt = this.#import_formatPostPublishedAt(post.get('published_at'), timezone, locale);
+ 
++        /** @type {string | undefined} */
+         let authors;
+         const postAuthors = await post.getLazyRelation('authors');
+         if (postAuthors?.models) {
+@@ -1135,6 +1462,7 @@ class EmailRenderer {
+ 
+         const hasEmailOnlyFlag = post.related('posts_meta')?.get('email_only') ?? false;
+ 
++        /** @type {LatestPost[]} */
+         const latestPosts = [];
+         let latestPostsHasImages = false;
+         if (newsletter.get('show_latest_posts')) {
+@@ -1184,6 +1512,7 @@ class EmailRenderer {
+ 
+         const linkStyle = (hasAnyEmailCustomization && newsletter.get('link_style')) || 'underline';
+ 
++        /** @type {TemplateData} */
+         const data = {
+             site: {
+                 title: this.#settingsCache.get('title'),
+@@ -1278,7 +1607,11 @@ class EmailRenderer {
+     /**
+      * @private
+      * Sets and limits the width of an image + returns the width
+-     * @returns {Promise<{href: string, width: number, height: number | null}>}
++     *
++     * @param {string | undefined | null} href
++     * @param {number=} visibleWidth
++     * @param {number|null=} visibleHeight
++     * @returns {Promise<{href: string | undefined | null, width: number, height: number | null}>}
+      */
+     async limitImageWidth(href, visibleWidth = 600, visibleHeight = null) {
+         if (!href) {
+@@ -1288,7 +1621,7 @@ class EmailRenderer {
+                 height: null
+             };
+         }
+-        if (isUnsplashImage(href)) {
++        if (this.#import_isUnsplashImage(href)) {
+             // Unsplash images have a minimum size so assuming 1200px is safe
+             const unsplashUrl = new URL(href);
+             unsplashUrl.searchParams.delete('w');
+@@ -1341,7 +1674,7 @@ class EmailRenderer {
+                 };
+             } catch (err) {
+                 // log and proceed. Using original header image without fixed width isn't fatal.
+-                logging.error(err);
++                this.#import_logging.error(err);
+             }
+         }
+ 
+@@ -1354,3 +1687,5 @@ class EmailRenderer {
+ }
+ 
+ module.exports = EmailRenderer;
++
++/** @typedef {ConstructorParameters<typeof EmailRenderer>[0]} Dependencies */
+diff --git a/core/server/services/email-service/EmailRendererTypes.d.ts b/core/server/services/email-service/EmailRendererTypes.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf542313ca
+--- /dev/null
++++ b/core/server/services/email-service/EmailRendererTypes.d.ts
+@@ -0,0 +1,98 @@
++export interface TemplateData {
++  site: {
++    title: string;
++    url: string;
++    iconUrl: string | null;
++  };
++  preheader: string;
++  html: string;
++  post: {
++    title: string;
++    url: string;
++    commentUrl: string;
++    authors: string | undefined;
++    publishedAt: string;
++    customExcerpt: string | undefined | null;
++    feature_image: string | undefined | null;
++    feature_image_width: number;
++    feature_image_height: number | null;
++    feature_image_alt: string | undefined | null;
++    feature_image_caption: string | undefined | null;
++  };
++
++  newsletter: {
++    name: string;
++    showPostTitleSection: boolean;
++    showExcerpt: boolean;
++    showCommentCta: boolean;
++    showSubscriptionDetails: boolean;
++  };
++  latestPosts: LatestPost[];
++  latestPostsHasImages: boolean;
++
++  //CSS
++  accentColor: string;
++  adjustedAccentColor: string;
++  adjustedAccentContrastColor: string;
++  showBadge: boolean;
++  backgroundColor: string;
++  backgroundIsDark: boolean;
++  postTitleColor: string;
++  titleWeight: TitleWeight;
++  titleStrongWeight: TitleStrongWeight;
++  textColor: string;
++  secondaryTextColor: string;
++  linkColor: string;
++  hasRoundedImageCorners: boolean;
++  buttonBorderRadius: ButtonBorderRadius;
++  sectionTitleColor: string|null;
++  headerImage: string|undefined|null;
++  headerImageWidth: number;
++  showHeaderIcon: false | string;
++  dividerColor: string;
++
++  showHeaderTitle: boolean;
++  showHeaderName: boolean;
++  showFeatureImage: boolean;
++  footerContent: string|undefined|null;
++  linkStyle: string;
++  hasOutlineButtons: boolean;
++
++  classes: {
++    container: string;
++    title: string;
++    titleLink: string;
++    excerpt: string;
++    meta: string;
++    body: string;
++  };
++
++  // Audience feedback
++  feedbackButtons: {
++    likeHref: string;
++    dislikeHref: string;
++  } | null;
++
++  // Paywall
++  paywall: {
++    signupUrl: string;
++  } | null;
++
++  year: string;
++}
++
++export interface LatestPost {
++  title: string;
++  url: string;
++  featureImage: null | { src: string; width: number; height: number | null };
++  featureImageMobile: null | {
++    src: string;
++    width: number;
++    height: number | null;
++  };
++  excerpt: string;
++}
++
++export type TitleWeight = '400' | '500' | '600' | '700';
++export type TitleStrongWeight='700' | '800';
++export type ButtonBorderRadius ='6px'|'0'|'9999px';
+\ No newline at end of file
+diff --git a/core/server/services/email-service/helpers/register-helpers.d.ts b/core/server/services/email-service/helpers/register-helpers.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..35ea3134b22713363c05a3ab28700cb78e0dfaff
+--- /dev/null
++++ b/core/server/services/email-service/helpers/register-helpers.d.ts
+@@ -0,0 +1,8 @@
++declare const exports: {
++  registerHelpers: (
++    handlebars: typeof import("handlebars"),
++    labs: import("../EmailRenderer").DependenciesLabs,
++    thist: import("../EmailRenderer").DependenciesT
++  ) => void;
++};
++export = exports;
+diff --git a/reexports-for-lite/lexical.mjs b/reexports-for-lite/lexical.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..ad68b41e4317da7a5d1dcfb6053f4ef345845a3e
+--- /dev/null
++++ b/reexports-for-lite/lexical.mjs
+@@ -0,0 +1,2 @@
++export { default as LexicalHtmlRenderer } from "@tryghost/kg-lexical-html-renderer";
++export { DEFAULT_NODES } from "@tryghost/kg-default-nodes";
+diff --git a/reexports-for-lite/mobiledoc.mjs b/reexports-for-lite/mobiledoc.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..8867a70aac202e03994b65de1849e262afb71ec8
+--- /dev/null
++++ b/reexports-for-lite/mobiledoc.mjs
+@@ -0,0 +1,3 @@
++export { default as MobiledocHtmlRenderer } from "@tryghost/kg-mobiledoc-html-renderer";
++export { default as CardFactory } from "@tryghost/kg-card-factory";
++export { default as defaultCards } from "@tryghost/kg-default-cards";;
+diff --git a/yarn.lock b/yarn.lock
+deleted file mode 100644
+index 0af3fa5d70b6165e95412f0ea2ba6427023c3626..0000000000000000000000000000000000000000
