@@ -4,13 +4,24 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    cheerio:
+      specifier: ^1.0.0
+      version: 1.0.0
+    ghost:
+      specifier: 5.121.0
+      version: 5.121.0
+    juice:
+      specifier: ^11.0.0
+      version: 11.0.1
+
 overrides:
   '@ghost-render/ghost>@tryghost/i18n': file:./node_modules/.pnpm-config/ghost/components/tryghost-i18n-5.121.0.tgz
   '@tryghost/kg-default-cards>juice@^10.0.0': ^11.0.0
   ghost>juice@9.1.0: ^11.0.0
   ghost>cheerio@0.22.0: ^1.0.0
   '@tryghost/url-utils>cheerio@^0.22.0': ^1.0.0
-  juice@9.1.0>cheerio@^1.0.0-rc.12: 1.0.0-rc.12
   '@tryghost/i18n>i18next': '-'
   ghost>@extractus/oembed-extractor: '-'
   ghost>@faker-js/faker: '-'
@@ -178,6 +189,19 @@ importers:
         version: 3.0.0(vite@6.3.5(@types/node@22.15.30))
 
   packages/core: {}
+
+  packages/email-renderer:
+    dependencies:
+      cheerio:
+        specifier: 'catalog:'
+        version: 1.0.0
+      juice:
+        specifier: 'catalog:'
+        version: 11.0.1
+    devDependencies:
+      ghost:
+        specifier: 'catalog:'
+        version: 5.121.0(patch_hash=01dfe7a41eced5c662326d17c57d63606e5622948911bf10b1fbf1e732355761)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
 
   packages/ghost:
     dependencies:

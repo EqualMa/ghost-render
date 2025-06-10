@@ -1,5 +1,9 @@
 packages:
   - packages/*
+catalog:
+  ghost: 5.121.0
+  juice: ^11.0.0
+  cheerio: ^1.0.0
 configDependencies:
   ghost: "5.121.0+sha512-4aaHZnx2yzn3HWgr3qeSqygwQrM2cJJMTcw660+ocrz3Kt353u/Vf0brg55FoqqjgrJh5NCyqHHJ4J27Fj0+gA=="
 ignoredBuiltDependencies:
@@ -12,11 +16,10 @@ overrides:
   # MAKE SURE API CHANGES ARE NOT BREAKING:
   # - https://github.com/Automattic/juice/releases
   # - https://github.com/cheeriojs/cheerio/releases
-  "@tryghost/kg-default-cards>juice@^10.0.0": ^11.0.0
-  ghost>juice@9.1.0: ^11.0.0
-  ghost>cheerio@0.22.0: ^1.0.0
-  "@tryghost/url-utils>cheerio@^0.22.0": ^1.0.0
-  juice@9.1.0>cheerio@^1.0.0-rc.12: 1.0.0-rc.12
+  "@tryghost/kg-default-cards>juice@^10.0.0": "catalog:"
+  ghost>juice@9.1.0: "catalog:"
+  ghost>cheerio@0.22.0: "catalog:"
+  "@tryghost/url-utils>cheerio@^0.22.0": "catalog:"
   "@tryghost/i18n>i18next": "-"
   ghost>@extractus/oembed-extractor: "-"
   ghost>@faker-js/faker: "-"

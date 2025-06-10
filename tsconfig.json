@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.base",
   "files": [],
-  "references": [{ "path": "./packages/ghost" }]
+  "references": [
+    { "path": "./packages/ghost" },
+    { "path": "./packages/email-renderer" }
+  ]
 }
