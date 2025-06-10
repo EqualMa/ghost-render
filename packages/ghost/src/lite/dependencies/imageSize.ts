@@ -1,4 +1,4 @@
-import type { Dependencies } from "../../EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 
 const imageSize: Dependencies["imageSize"] = {
   getImageSizeFromUrl() {

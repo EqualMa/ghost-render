@@ -1,4 +1,4 @@
-import type { Imports } from "../../../EmailRenderer";
+import type { Imports } from "@ghost-render/email-renderer";
 
 const isValidLocale: Imports["isValidLocale"] = () => true;
 

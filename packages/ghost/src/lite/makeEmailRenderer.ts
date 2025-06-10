@@ -1,4 +1,4 @@
-import EmailRenderer from "../EmailRenderer";
+import EmailRenderer from "@ghost-render/email-renderer";
 import * as imports from "./dependencies/imports";
 import SettingsCache, { type Settings } from "./lib/SettingsCache";
 import type { DependenciesSettingsHelpers } from "ghost/core/server/services/email-service/EmailRenderer";

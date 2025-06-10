@@ -3,7 +3,7 @@ import {
   DEFAULT_NODES as nodes,
 } from "ghost/reexports-for-lite/lexical.mjs";
 
-import type { Dependencies } from "../../../EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 
 export interface RendererLexicalLabs {
   isSet(

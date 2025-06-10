@@ -1,4 +1,4 @@
-import type { Dependencies } from "../src/EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 
 interface ModulesDependencies
   extends Record<

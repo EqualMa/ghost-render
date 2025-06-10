@@ -4,7 +4,7 @@ import {
   defaultCards,
 } from "ghost/reexports-for-lite/mobiledoc.mjs";
 
-import type { Dependencies } from "../../../EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 
 export default function makeRendererMobiledoc({
   getSiteUrl,

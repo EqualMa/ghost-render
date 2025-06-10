@@ -2,6 +2,7 @@
   "name": "@ghost-render/ghost",
   "version": "0.1.0",
   "dependencies": {
+    "@ghost-render/email-renderer": "workspace:",
     "@types/node": "^22.15.30",
     "ghost": "5.121.0"
   },

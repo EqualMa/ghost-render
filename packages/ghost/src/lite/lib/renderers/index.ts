@@ -1,4 +1,4 @@
-import type { Dependencies } from "../../../EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 import makeRendererLexical, { type RendererLexicalLabs } from "./lexical";
 import makeRendererMobiledoc from "./mobiledoc";
 

@@ -1,4 +1,4 @@
-import type { Dependencies } from "../../EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 
 const storageUtils: Dependencies["storageUtils"] = {
   isLocalImage() {
