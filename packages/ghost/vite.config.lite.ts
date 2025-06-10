@@ -143,6 +143,10 @@ export default defineConfig({
         find: "simple-dom",
         replacement: "simple-dom/dist/commonjs/es5",
       },
+      {
+        find: "@tryghost/color-utils",
+        replacement: "@tryghost/color-utils/src/color-utils.ts",
+      },
     ],
   },
 });
