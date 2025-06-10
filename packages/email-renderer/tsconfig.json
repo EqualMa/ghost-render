@@ -4,5 +4,5 @@
     "allowJs": true,
     "maxNodeModuleJsDepth": 1
   },
-  "include": ["src", "*.ts"]
+  "include": ["*.{ts,js}", "tmp/**/*", "package.json"]
 }

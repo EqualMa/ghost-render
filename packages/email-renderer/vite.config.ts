@@ -2,28 +2,54 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import { dependencies } from "./package.json";
+import { viteStaticCopy } from "vite-plugin-static-copy";
+import * as _dts from "unplugin-dts/vite";
+
+const dts = (_dts as unknown as { default: typeof import("unplugin-dts/vite") })
+  .default;
 
 const deps = new Set(Object.keys(dependencies));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const MOD_EmailRenderer =
+  "ghost/core/server/services/email-service/EmailRenderer.js";
+const sourcePathOfEmailRenderer = fileURLToPath(
+  import.meta.resolve(MOD_EmailRenderer)
+);
+
 export default defineConfig({
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: [
+            sourcePathOfEmailRenderer,
+            resolve(
+              dirname(sourcePathOfEmailRenderer),
+              "EmailRendererTypes.d.ts"
+            ),
+          ],
+          dest: resolve(__dirname, "tmp"),
+        },
+      ],
+      hook: "buildStart",
+    }),
+    dts({
+      bundleTypes: true,
+      copyDtsFiles: true,
+    }),
+  ],
   build: {
     target: "esnext",
     sourcemap: true,
     lib: {
-      entry: { index: resolve(__dirname, "src/index.ts") },
+      entry: "index.ts",
       formats: ["es"],
+      fileName: "index",
     },
     rollupOptions: {
       external: (source, importer, isResolved) => {
-        if (
-          source.includes(
-            "/ghost/core/server/services/email-service/EmailRenderer.js"
-          )
-        )
-          return false;
-
         if (deps.has(source)) return true;
 
         if (source.includes("/node_modules/"))
@@ -34,6 +60,11 @@ isResolved: ${isResolved}`);
 
         return false;
       },
+    },
+  },
+  resolve: {
+    alias: {
+      [MOD_EmailRenderer]: resolve(__dirname, "tmp/EmailRenderer.js"),
     },
   },
 });

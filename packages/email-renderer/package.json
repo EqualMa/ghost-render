@@ -6,6 +6,9 @@
     "juice": "catalog:",
     "cheerio": "catalog:"
   },
+  "scripts": {
+    "build": "vite build"
+  },
   "devDependencies": {
     "ghost": "catalog:"
   }

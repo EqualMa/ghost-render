@@ -19,7 +19,7 @@ index 0000000000000000000000000000000000000000..437fa010da76a908550724e70fe81ef7
 @@ -0,0 +1 @@
 +export const Post: unknown;
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..b529837f5a3e35ace72e2219412df9d24b58ec92 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..c53a8fdf93fa3b2445233b64adb95e7961dc2531 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,20 +1,16 @@
@@ -1054,10 +1054,12 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..b529837f5a3e35ace72e2219412df9d2
              }
          }
  
-@@ -1354,3 +1687,5 @@ class EmailRenderer {
+@@ -1353,4 +1686,6 @@ class EmailRenderer {
+     }
  }
  
- module.exports = EmailRenderer;
+-module.exports = EmailRenderer;
++export default EmailRenderer;
 +
 +/** @typedef {ConstructorParameters<typeof EmailRenderer>[0]} Dependencies */
 diff --git a/core/server/services/email-service/EmailRendererTypes.d.ts b/core/server/services/email-service/EmailRendererTypes.d.ts
