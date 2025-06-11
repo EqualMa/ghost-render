@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import handlebars from "./vite-config/handlebars";
+import DependenciesUsed from "./vite-config/deps";
 import { analyzer } from "vite-bundle-analyzer";
 import { tsImport } from "tsx/esm/api";
 import type { OverridableModuleDescriptions } from "@ghost-render/full/vite-config/common";
@@ -11,7 +12,13 @@ const { MODULES, modulesToEntries } = (await tsImport(
   import.meta.url
 )) as typeof import("@ghost-render/full/vite-config/common");
 
-import { dependencies } from "./package.json";
+import { dependencies, devDependencies } from "./package.json";
+
+const deps = new DependenciesUsed(Object.keys(dependencies));
+const bundledDeps = new DependenciesUsed(Object.keys(devDependencies));
+
+// This package will be copied
+bundledDeps.markAsUsed("@tryghost/i18n");
 
 const LITE_MODULES = {
   ...MODULES,
@@ -60,6 +67,25 @@ export default defineConfig({
     }),
     handlebars,
     process.env.ANALYZE === "true" && analyzer(),
+    {
+      name: "no-unused-dependencies",
+      buildEnd(error) {
+        if (error) return;
+        {
+          const unusedDeps = deps.unusedDeps();
+          if (unusedDeps.length)
+            this.warn(`Unused dependencies: ${unusedDeps.join(", ")}`);
+        }
+        {
+          const unusedBundledDeps = bundledDeps.unusedDeps();
+
+          if (unusedBundledDeps.length)
+            this.warn(
+              `Unused bundled dependencies: ${unusedBundledDeps.join(", ")}`
+            );
+        }
+      },
+    },
   ],
   build: {
     outDir: "dist",
@@ -127,8 +153,20 @@ export default defineConfig({
 
         return (source, importer) => {
           if (source.startsWith("node:")) return true;
-          if (importer && isImportedExternals(source, importer)) {
-            return true;
+
+          if (deps.testAndMarkAsUsed(source)) return true;
+          if (bundledDeps.testAndMarkAsUsed(source)) return false;
+
+          if (
+            importer?.includes("/node_modules/ghost/") &&
+            source === "nodemailer/lib/addressparser"
+          )
+            return false;
+
+          if (/^[a-zA-Z@]/.test(source)) {
+            throw new Error(
+              `implicit dependency ${source} imported by ${importer}`
+            );
           }
 
           return false;
