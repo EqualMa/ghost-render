@@ -77,12 +77,13 @@ type ModuleDescriptions = {
 export function modulesToEntries(
   modules: ModuleDescriptions,
   baseModule: string,
-  fileRoot: string
+  fileRoot: string,
+  ext = ""
 ): Record<string, string> {
   return Object.fromEntries(
     modulesToEntriesIterator(modules, baseModule).map((mod) => [
       mod,
-      joinRelPath(fileRoot, mod),
+      joinRelPath(fileRoot, mod) + ext,
     ])
   );
 }
@@ -95,7 +96,7 @@ function modulesToEntriesIterator(
     .values()
     .flatMap(([k, v]) => {
       if (!v) return [].values();
-      const mod = joinRelPath(baseModule, k);
+      const mod = joinRelPath(baseModule, k === "" ? "index" : k);
       if (v === true) return [mod].values();
       return modulesToEntriesIterator(v, mod);
     });

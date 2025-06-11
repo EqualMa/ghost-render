@@ -16,6 +16,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
+      output: { chunkFileNames: "_chunks/[name]-[hash].js" },
       external: (() => {
         const depNames = new Set(
           [dependencies, peerDependencies].flatMap((deps) => Object.keys(deps))
