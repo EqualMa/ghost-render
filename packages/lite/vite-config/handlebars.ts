@@ -9,16 +9,21 @@ const handlebars: Plugin = {
       return null;
     }
 
-    const spec = precompile(code, {
+    const { code: spec, map } = precompile(code, {
+      srcName: id,
       strict: true,
       preventIndent: true,
-    });
+    }) as { code: string; map: string };
 
     if (typeof spec !== "string") {
       throw new Error("unexpected template spec", spec);
     }
 
-    return `export default ${spec};`;
+    // TODO: the sourcemap is wrong because we add some code
+    return {
+      code: `export default ${spec};`,
+      map,
+    };
   },
 };
 
