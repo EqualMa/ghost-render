@@ -2,7 +2,8 @@
   "extends": "./tsconfig.base",
   "files": [],
   "references": [
-    { "path": "./packages/ghost" },
-    { "path": "./packages/email-renderer" }
+    { "path": "./packages/email-renderer" },
+    { "path": "./packages/full" },
+    { "path": "./packages/lite" }
   ]
 }

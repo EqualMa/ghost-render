@@ -1,5 +1,6 @@
 import type { Plugin } from "vite";
-import { precompile } from "handlebars";
+import handlebarsImport from "handlebars";
+const { precompile } = handlebarsImport;
 
 const handlebars: Plugin = {
   name: "handlebars",

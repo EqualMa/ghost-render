@@ -11,7 +11,7 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - esbuild
 overrides:
-  "@ghost-render/ghost>@tryghost/i18n": "file:./node_modules/.pnpm-config/ghost/components/tryghost-i18n-5.121.0.tgz"
+  "@tryghost/i18n": "file:./node_modules/.pnpm-config/ghost/components/tryghost-i18n-5.121.0.tgz"
   # override juice and cheerio
   # MAKE SURE API CHANGES ARE NOT BREAKING:
   # - https://github.com/Automattic/juice/releases

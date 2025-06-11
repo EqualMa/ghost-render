@@ -1,4 +1,4 @@
-import DateTime from "../../../reexports/luxon/DateTime";
+import DateTime from "../../reexports/luxon/DateTime";
 
 export default function formatDateLong(
   date: Date,

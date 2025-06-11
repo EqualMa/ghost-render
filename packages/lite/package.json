@@ -1,0 +1,18 @@
+{
+  "name": "@ghost-render/lite",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@ghost-render/email-renderer": "workspace:",
+    "luxon": "^3.6.1",
+    "handlebars": "^4.7.8",
+    "@tryghost/color-utils": "^0.2.6",
+    "@tryghost/html-to-plaintext": "^1.0.4",
+    "@tryghost/kg-default-cards": "^10.1.3"
+  },
+  "devDependencies": {
+    "ghost": "catalog:",
+    "@ghost-render/full": "workspace:",
+    "@tryghost/i18n": "*"
+  }
+}

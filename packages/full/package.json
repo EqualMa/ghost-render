@@ -1,12 +1,12 @@
 {
-  "name": "@ghost-render/ghost",
+  "name": "@ghost-render/full",
   "version": "0.1.0",
+  "type": "module",
   "dependencies": {
-    "@ghost-render/email-renderer": "workspace:",
-    "@types/node": "^22.15.30",
-    "ghost": "5.121.0"
+    "@ghost-render/email-renderer": "workspace:"
   },
   "peerDependencies": {
+    "ghost": "catalog:",
     "luxon": "^3.6.1",
     "handlebars": "^4.7.8",
     "@tryghost/color-utils": "^0.2.6",
@@ -15,6 +15,9 @@
     "@tryghost/i18n": "*"
   },
   "peerDependenciesMeta": {
+    "ghost": {
+      "optional": true
+    },
     "luxon": {
       "optional": true
     },

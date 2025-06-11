@@ -1,5 +1,5 @@
 import { registerHelpers } from "ghost/core/server/services/email-service/helpers/register-helpers";
-import handlebarsRuntimeCreate from "../../../reexports/handlebars/runtime/create";
+import handlebarsRuntimeCreate from "@ghost-render/full/src/reexports/handlebars/runtime/create";
 
 import cssPartialSource from "ghost/core/server/services/email-service/email-templates/partials/styles.hbs";
 import paywallPartial from "ghost/core/server/services/email-service/email-templates/partials/paywall.hbs";

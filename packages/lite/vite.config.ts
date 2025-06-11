@@ -1,15 +1,17 @@
 import { dirname, resolve, relative, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
-import {
-  MODULES,
-  modulesToEntries,
-  type OverridableModuleDescriptions,
-} from "./vite-config/common";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import handlebars from "./vite-config/handlebars";
-
 import { analyzer } from "vite-bundle-analyzer";
+import { tsImport } from "tsx/esm/api";
+import type { OverridableModuleDescriptions } from "@ghost-render/full/vite-config/common";
+const { MODULES, modulesToEntries } = (await tsImport(
+  "@ghost-render/full/vite-config/common",
+  import.meta.url
+)) as typeof import("@ghost-render/full/vite-config/common");
+
+import { dependencies } from "./package.json";
 
 const LITE_MODULES = {
   ...MODULES,
@@ -38,7 +40,7 @@ const LITE_MODULES = {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const localesDir = resolve(
-  dirname(require.resolve("@tryghost/i18n/package.json")),
+  dirname(fileURLToPath(import.meta.resolve("@tryghost/i18n/package.json"))),
   "locales/"
 );
 
@@ -65,14 +67,11 @@ export default defineConfig({
     target: "esnext",
     sourcemap: true,
     lib: {
-      entry: {
-        ...modulesToEntries(LITE_MODULES, "lite", resolve(__dirname, "src")),
-        EmailRenderer: resolve(__dirname, "src/EmailRenderer"),
-      },
+      entry: modulesToEntries(LITE_MODULES, "", resolve(__dirname, "src")),
       formats: ["es"],
     },
     rollupOptions: {
-      output: { chunkFileNames: "lite/[name]-[hash].js" },
+      output: { chunkFileNames: "_chunks/[name]-[hash].js" },
       external: (() => {
         const importedExternals = {
           jsdom: [
