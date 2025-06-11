@@ -1,4 +1,4 @@
-import type { DependenciesAudienceFeedbackService } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesAudienceFeedbackService } from "@ghost-render/email-renderer";
 
 const audienceFeedbackService: DependenciesAudienceFeedbackService = {
   buildLink() {

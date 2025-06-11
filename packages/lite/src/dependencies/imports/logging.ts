@@ -1,4 +1,4 @@
-import type { ImportsLogging } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { ImportsLogging } from "@ghost-render/email-renderer";
 import { ImageSizeError } from "../imageSize";
 
 const logging: ImportsLogging = {

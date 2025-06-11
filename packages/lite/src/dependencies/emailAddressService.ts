@@ -1,4 +1,4 @@
-import type { DependenciesEmailAddressService } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesEmailAddressService } from "@ghost-render/email-renderer";
 
 const emailAddressService: DependenciesEmailAddressService = {
   getAddress() {

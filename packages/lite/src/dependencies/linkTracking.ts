@@ -1,4 +1,4 @@
-import type { DependenciesLinkTracking } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesLinkTracking } from "@ghost-render/email-renderer";
 const linkTracking: DependenciesLinkTracking = {
   service: {
     addTrackingToUrl() {

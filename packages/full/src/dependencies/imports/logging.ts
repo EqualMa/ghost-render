@@ -1,4 +1,4 @@
-import type { ImportsLogging } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { ImportsLogging } from "@ghost-render/email-renderer";
 
 const logging: ImportsLogging = console;
 

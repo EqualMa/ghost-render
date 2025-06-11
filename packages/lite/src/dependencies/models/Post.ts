@@ -1,7 +1,7 @@
 import type {
   DependenciesModelsPost,
   Post,
-} from "ghost/core/server/services/email-service/EmailRenderer";
+} from "@ghost-render/email-renderer";
 
 const ModelPost: DependenciesModelsPost = {
   findPage: (): Promise<{ data: Post[] }> => {

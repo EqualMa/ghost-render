@@ -1,7 +1,7 @@
 import type {
   DependenciesLabs,
   DependenciesLabsKnownKey,
-} from "ghost/core/server/services/email-service/EmailRenderer";
+} from "@ghost-render/email-renderer";
 
 export type LabsValues = { [_ in DependenciesLabsKnownKey]?: boolean };
 

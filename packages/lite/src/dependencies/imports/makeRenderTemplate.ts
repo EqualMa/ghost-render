@@ -9,7 +9,7 @@ import htmlTemplateSource from "ghost/core/server/services/email-service/email-t
 import type {
   ImportsMakeRenderTemplateDeps,
   ImportsRenderTemplate,
-} from "ghost/core/server/services/email-service/EmailRenderer";
+} from "@ghost-render/email-renderer";
 
 export default function makeRenderTemplate({
   labs,

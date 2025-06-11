@@ -1,4 +1,4 @@
-import type { Dependencies } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { Dependencies } from "@ghost-render/email-renderer";
 import { forPost } from "ghost/core/server/api/endpoints/utils/serializers/output/utils/url";
 
 export default (function getPostUrl(post) {

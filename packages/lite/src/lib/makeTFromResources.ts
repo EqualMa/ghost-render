@@ -1,4 +1,4 @@
-import type { DependenciesT } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesT } from "@ghost-render/email-renderer";
 
 function t(resources: TResources, key: string, context: unknown): string {
   let value = resources[key] || key;

@@ -1,4 +1,4 @@
-import type { DependenciesOutboundLinkTagger } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesOutboundLinkTagger } from "@ghost-render/email-renderer";
 
 const outboundLinkTagger: DependenciesOutboundLinkTagger = {
   addToUrl() {

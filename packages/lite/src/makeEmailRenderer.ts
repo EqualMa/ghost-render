@@ -1,7 +1,7 @@
 import EmailRenderer from "@ghost-render/email-renderer";
 import * as imports from "./dependencies/imports";
 import SettingsCache, { type Settings } from "./lib/SettingsCache";
-import type { DependenciesSettingsHelpers } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesSettingsHelpers } from "@ghost-render/email-renderer";
 import imageSize from "./dependencies/imageSize";
 import UrlUtils, { type UrlUtilsOptions } from "./lib/UrlUtils";
 import storageUtils from "./dependencies/storageUtils";

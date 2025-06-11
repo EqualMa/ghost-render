@@ -1,4 +1,4 @@
-import type { DependenciesMemberAttributionService } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesMemberAttributionService } from "@ghost-render/email-renderer";
 
 const memberAttributionService: DependenciesMemberAttributionService = {
   addPostAttributionTracking() {

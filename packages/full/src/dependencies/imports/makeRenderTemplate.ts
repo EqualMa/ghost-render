@@ -1,5 +1,5 @@
 import { registerHelpers } from "ghost/core/server/services/email-service/helpers/register-helpers";
-import type { Imports } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { Imports } from "@ghost-render/email-renderer";
 import { create as handlebarsCreate } from "handlebars";
 import * as fsp from "node:fs/promises";
 import { fileURLToPath } from "node:url";

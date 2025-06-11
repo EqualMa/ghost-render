@@ -1,4 +1,4 @@
-import type { DependenciesSettingsCacheKnownField } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesSettingsCacheKnownField } from "@ghost-render/email-renderer";
 import makeFields from "../makeFields";
 
 export type Settings = Record<DependenciesSettingsCacheKnownField, string>;

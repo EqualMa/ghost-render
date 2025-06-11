@@ -1,5 +1,5 @@
 import i18nLib from "@tryghost/i18n";
-import type { DependenciesMakeT } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesMakeT } from "@ghost-render/email-renderer";
 
 export default (function makeT({ labs, settingsCache }) {
   const i18nLanguage = labs.isSet("i18n")

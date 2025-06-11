@@ -1,4 +1,4 @@
-import type { DependenciesUrlUtils } from "ghost/core/server/services/email-service/EmailRenderer";
+import type { DependenciesUrlUtils } from "@ghost-render/email-renderer";
 
 /** Initialization method to pass in URL configurations */
 export interface UrlUtilsOptions {
