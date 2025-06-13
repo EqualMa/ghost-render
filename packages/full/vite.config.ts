@@ -3,10 +3,12 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import { MODULES, modulesToEntries } from "./vite-config/common";
 import { dependencies, peerDependencies } from "./package.json";
+import pkg from "./vite-config/plugin-pkg";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  plugins: [pkg()],
   build: {
     outDir: "dist",
     target: "esnext",

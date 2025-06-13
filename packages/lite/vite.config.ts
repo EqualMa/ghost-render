@@ -11,7 +11,10 @@ const { MODULES, modulesToEntries } = (await tsImport(
   "@ghost-render/full/vite-config/common",
   import.meta.url
 )) as typeof import("@ghost-render/full/vite-config/common");
-
+const { default: pkg } = (await tsImport(
+  "@ghost-render/full/vite-config/plugin-pkg",
+  import.meta.url
+)) as typeof import("@ghost-render/full/vite-config/plugin-pkg");
 import { dependencies, devDependencies } from "./package.json";
 
 const deps = new DependenciesUsed(Object.keys(dependencies));
@@ -86,6 +89,7 @@ export default defineConfig({
         }
       },
     },
+    pkg(),
   ],
   build: {
     outDir: "dist",
