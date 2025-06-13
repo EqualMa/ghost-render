@@ -1,6 +1,5 @@
 // @ts-check
 
-import { dts } from "rollup-plugin-dts";
 import { defineConfig } from "rollup";
 import { tsImport } from "tsx/esm/api";
 import { dirname, resolve } from "path";
@@ -13,15 +12,15 @@ const { MODULES, modulesToEntries } = await tsImport(
   "./vite-config/common.ts",
   import.meta.url
 );
+/** @type {typeof import("./vite-config/dts-rollup.ts")} */
+const { default: dtsRollupOptions } = await tsImport(
+  "./vite-config/dts-rollup.ts",
+  import.meta.url
+);
 
 export default defineConfig({
+  ...dtsRollupOptions(),
   input: modulesToEntries(MODULES, "", resolve(__dirname, "src"), ".ts"),
-  output: {
-    dir: "dist",
-    chunkFileNames: "_chunks/[name]-[hash].d.ts",
-    sourcemap: true,
-  },
-  plugins: [dts({ respectExternal: true })],
   external: (source) => {
     if (source === "ghost" || source.startsWith("ghost/")) return false;
 

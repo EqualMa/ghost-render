@@ -2,6 +2,9 @@
   "name": "@ghost-render/lite",
   "version": "0.1.0",
   "type": "module",
+  "scripts": {
+    "build": "vite build && rollup -c"
+  },
   "dependencies": {
     "@ghost-render/email-renderer": "workspace:",
     "luxon": "^3.6.1",
