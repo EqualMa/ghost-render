@@ -40,7 +40,6 @@ export default defineConfig({
           },
         },
       ],
-      hook: "buildStart",
     }),
     handlebars,
     process.env.ANALYZE === "true" && analyzer(),
