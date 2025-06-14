@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base",
+  "compilerOptions": {
+    "allowJs": true,
+    "maxNodeModuleJsDepth": 2
+  },
+  "include": ["*.{ts,js}", "package.json"]
+}

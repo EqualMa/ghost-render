@@ -1228,15 +1228,6 @@ index 0000000000000000000000000000000000000000..ad68b41e4317da7a5d1dcfb6053f4ef3
 @@ -0,0 +1,2 @@
 +export { default as LexicalHtmlRenderer } from "@tryghost/kg-lexical-html-renderer";
 +export { DEFAULT_NODES } from "@tryghost/kg-default-nodes";
-diff --git a/reexports-for-lite/mobiledoc.mjs b/reexports-for-lite/mobiledoc.mjs
-new file mode 100644
-index 0000000000000000000000000000000000000000..8867a70aac202e03994b65de1849e262afb71ec8
---- /dev/null
-+++ b/reexports-for-lite/mobiledoc.mjs
-@@ -0,0 +1,3 @@
-+export { default as MobiledocHtmlRenderer } from "@tryghost/kg-mobiledoc-html-renderer";
-+export { default as CardFactory } from "@tryghost/kg-card-factory";
-+export { default as defaultCards } from "@tryghost/kg-default-cards";;
 diff --git a/yarn.lock b/yarn.lock
 deleted file mode 100644
 index 0af3fa5d70b6165e95412f0ea2ba6427023c3626..0000000000000000000000000000000000000000

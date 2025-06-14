@@ -15,7 +15,7 @@ import outboundLinkTagger from "./dependencies/outboundLinkTagger";
 import Labs, { type LabsValues } from "./lib/Labs";
 import * as models from "./dependencies/models";
 import makeTFromResources, { type TResources } from "./lib/makeTFromResources";
-import makeRenderers from "./lib/renderers";
+import makeRenderers, { type MobiledocMakeRenderer } from "./lib/renderers";
 
 export default function makeEmailRendererLite({
   settings,
@@ -23,12 +23,14 @@ export default function makeEmailRendererLite({
   urlUtilsOptions,
   labs: labsValues,
   tResources,
+  mobiledocMakeRenderer,
 }: {
   settings: Settings;
   settingsHelpers: DependenciesSettingsHelpers;
   urlUtilsOptions: UrlUtilsOptions;
   labs: LabsValues;
   tResources: TResources;
+  mobiledocMakeRenderer: MobiledocMakeRenderer | undefined;
 }): EmailRenderer {
   const settingsCache = new SettingsCache(settings);
   const urlUtils = new UrlUtils(urlUtilsOptions);
@@ -41,7 +43,12 @@ export default function makeEmailRendererLite({
     renderers: makeRenderers({
       getSiteUrl: urlUtilsOptions.getSiteUrl,
       labs,
-      loggingError: imports.logging.error,
+      mobiledoc: mobiledocMakeRenderer
+        ? {
+            makeRenderer: mobiledocMakeRenderer,
+            loggingError: imports.logging.error,
+          }
+        : undefined,
     }),
     imageSize,
     urlUtils,

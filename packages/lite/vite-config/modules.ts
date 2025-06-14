@@ -23,7 +23,6 @@ export const LITE_MODULES = {
     renderers: {
       "": true,
       lexical: true,
-      mobiledoc: true,
     },
     Labs: true,
     makeTFromResources: true,

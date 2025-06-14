@@ -4,6 +4,7 @@
   "references": [
     { "path": "./packages/email-renderer" },
     { "path": "./packages/full" },
+    { "path": "./packages/email-renderer-mobiledoc" },
     { "path": "./packages/lite" }
   ]
 }

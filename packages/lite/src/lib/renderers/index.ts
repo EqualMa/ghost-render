@@ -1,24 +1,43 @@
 import type { Dependencies } from "@ghost-render/email-renderer";
 import makeRendererLexical, { type RendererLexicalLabs } from "./lexical";
-import makeRendererMobiledoc from "./mobiledoc";
 
 export default function makeRenderers({
   getSiteUrl,
   labs,
-  loggingError,
+  mobiledoc,
 }: {
   getSiteUrl: () => string;
   labs: RendererLexicalLabs;
-  loggingError: (msg: unknown) => void;
+  mobiledoc: MakeRenderersMobiledoc | undefined;
 }): Dependencies["renderers"] {
   return {
     lexical: makeRendererLexical({
       getSiteUrl,
       labs,
     }),
-    mobiledoc: makeRendererMobiledoc({
-      getSiteUrl,
-      loggingError,
-    }),
+    mobiledoc: mobiledoc
+      ? mobiledoc.makeRenderer({
+          getSiteUrl,
+          loggingError: mobiledoc.loggingError,
+        })
+      : unimplementedRendererMobiledoc(),
+  };
+}
+
+export interface MakeRenderersMobiledoc {
+  makeRenderer: MobiledocMakeRenderer;
+  loggingError: (msg: unknown) => void;
+}
+
+export type MobiledocMakeRenderer = (context: {
+  getSiteUrl: () => string;
+  loggingError: (msg: unknown) => void;
+}) => Dependencies["renderers"]["mobiledoc"];
+
+function unimplementedRendererMobiledoc(): Dependencies["renderers"]["mobiledoc"] {
+  return {
+    render: () => {
+      throw new Error("mobiledoc renderer not implemented");
+    },
   };
 }
