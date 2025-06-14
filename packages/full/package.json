@@ -2,6 +2,10 @@
   "name": "@ghost-render/full",
   "version": "0.1.0",
   "type": "module",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
   "scripts": {
     "build": "vite build && rollup -c"
   },

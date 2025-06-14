@@ -1,5 +1,6 @@
 {
-  "name": "ghost-render",
+  "name": "@ghost-render/main",
+  "files": [],
   "private": true,
   "version": "0.0.0",
   "type": "module",

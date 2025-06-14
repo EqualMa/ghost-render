@@ -3,6 +3,7 @@ import {
   CardFactory,
   defaultCards,
 } from "ghost/reexports-for-lite/mobiledoc.mjs";
+import atoms from "@tryghost/kg-default-atoms";
 
 import type { Dependencies } from "@ghost-render/email-renderer";
 
@@ -26,8 +27,6 @@ export default function makeRendererMobiledoc({
   const cards = defaultCards.map((card: unknown) => {
     return cardFactory.createCard(card);
   });
-
-  const atoms = require("@tryghost/kg-default-atoms");
 
   const mobiledocHtmlRenderer = new MobiledocHtmlRenderer({
     cards,
