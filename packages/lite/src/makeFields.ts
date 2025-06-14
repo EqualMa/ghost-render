@@ -8,7 +8,7 @@ export default function makeFields<Defs extends object, T>(fieldDefs: {
       this.#data = data;
     }
 
-    __data(): T {
+    __getData(): T {
       return this.#data;
     }
 

@@ -28,5 +28,6 @@ export const LITE_MODULES = {
     makeTFromResources: true,
     SettingsCache: true,
     UrlUtils: true,
+    PostModel: true,
   },
 } as const;

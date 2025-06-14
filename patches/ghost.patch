@@ -48,7 +48,7 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..13c65aa6bced41eea2c2347dce8b8b7da294f600 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a6af7ee60 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,20 +1,19 @@
@@ -135,7 +135,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..13c65aa6bced41eea2c2347dce8b8b7d
 + * @prop {string} id
 + * @prop {<K extends keyof PostKnownFields>(this: Post, field: K) => PostKnownFields[K]} get
 + * @prop {<K extends keyof PostKnownRelations>(this: Post, model: K) => PostKnownRelations[K]} related
-+ * @prop {<K extends keyof PostKnownLazyRelations>(this: Post, model: K) => undefined | null | { models: PostKnownLazyRelations[K][] }} getLazyRelation
++ * @prop {<K extends keyof PostKnownLazyRelations>(this: Post, model: K) => Promise<PostKnownLazyRelations[K]> | PostKnownLazyRelations[K]} getLazyRelation
 + * @prop {(this: Post) => object} toJSON
 + * // TODO: post.toJSON() is only required by full getPostUrl
 + *
@@ -155,7 +155,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..13c65aa6bced41eea2c2347dce8b8b7d
 + * @prop {PostsMeta} posts_meta
 + *
 + * @typedef {object} PostKnownLazyRelations
-+ * @prop {Author} authors
++ * @prop {undefined | null | { models: Author[] }} authors
 + *
 + * @typedef {object} Author
 + * @prop {(_: 'name') => string} get

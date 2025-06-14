@@ -17,6 +17,8 @@ import * as models from "./dependencies/models";
 import makeTFromResources, { type TResources } from "./lib/makeTFromResources";
 import makeRenderers, { type MobiledocMakeRenderer } from "./lib/renderers";
 
+export type { EmailRenderer };
+
 export default function makeEmailRendererLite({
   settings,
   settingsHelpers,
