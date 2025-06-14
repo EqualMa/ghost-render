@@ -48,11 +48,14 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5f2f57e95 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..13c65aa6bced41eea2c2347dce8b8b7da294f600 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
-@@ -1,20 +1,16 @@
+@@ -1,20 +1,19 @@
 +// @ts-check
++
++import { load as cheerioLoad } from 'cheerio';
++import juice from 'juice';
 +
 +/**
 + * @import {TemplateData, LatestPost, TitleWeight, TitleStrongWeight, ButtonBorderRadius} from "./EmailRendererTypes"
@@ -79,7 +82,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
  const t = (x) => {
      return x;
  };
-@@ -31,6 +27,10 @@ const messages = {
+@@ -31,6 +30,10 @@ const messages = {
      }
  };
  
@@ -90,7 +93,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
  function escapeHtml(unsafe) {
      return unsafe
          .replace(/&/g, '&amp;')
-@@ -40,38 +40,92 @@ function escapeHtml(unsafe) {
+@@ -40,38 +43,90 @@ function escapeHtml(unsafe) {
          .replace(/'/g, '&#039;');
  }
  
@@ -125,8 +128,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
 -    const cheerio = require('cheerio');
 -    return cheerio.load(html);
 -}
-+const { load: cheerioLoad } = require('cheerio');
- 
+-
  /**
   * @typedef {string|null} Segment
   * @typedef {object} Post
@@ -206,7 +208,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
   */
  
  /**
-@@ -115,7 +169,205 @@ function cheerioLoad(html) {
+@@ -115,7 +170,205 @@ function cheerioLoad(html) {
   * @prop {ReplacementDefinition[]} replacements
   */
  
@@ -412,7 +414,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
      #settingsCache;
      #settingsHelpers;
  
-@@ -126,7 +378,6 @@ class EmailRenderer {
+@@ -126,7 +379,6 @@ class EmailRenderer {
      #getPostUrl;
      #storageUtils;
  
@@ -420,7 +422,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
      #renderTemplate;
      #linkReplacer;
      #linkTracking;
-@@ -140,26 +391,28 @@ class EmailRenderer {
+@@ -140,26 +392,28 @@ class EmailRenderer {
  
      /**
       * @param {object} dependencies
@@ -463,7 +465,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          settingsCache,
          settingsHelpers,
          renderers,
-@@ -175,8 +428,10 @@ class EmailRenderer {
+@@ -175,8 +429,10 @@ class EmailRenderer {
          outboundLinkTagger,
          labs,
          models,
@@ -475,7 +477,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          this.#settingsCache = settingsCache;
          this.#settingsHelpers = settingsHelpers;
          this.#renderers = renderers;
-@@ -193,14 +448,38 @@ class EmailRenderer {
+@@ -193,14 +449,38 @@ class EmailRenderer {
          this.#labs = labs;
          this.#models = models;
          this.#t = t;
@@ -514,7 +516,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          let senderName = this.#settingsCache.get('title') ? this.#settingsCache.get('title').replace(/"/g, '\\"') : '';
          if (newsletter.get('sender_name')) {
              senderName = newsletter.get('sender_name');
-@@ -215,7 +494,7 @@ class EmailRenderer {
+@@ -215,7 +495,7 @@ class EmailRenderer {
          if (process.env.NODE_ENV !== 'production') {
              if (/@localhost$/.test(fromAddress) || /@ghost.local$/.test(fromAddress)) {
                  const localAddress = 'localhost@example.com';
@@ -523,7 +525,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
                  fromAddress = localAddress;
              }
          }
-@@ -237,20 +516,25 @@ class EmailRenderer {
+@@ -237,20 +517,25 @@ class EmailRenderer {
          locale = locale.trim();
  
          // If the locale is just "en", or is not valid, revert to default
@@ -551,7 +553,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
      }
  
      /**
-@@ -275,7 +559,7 @@ class EmailRenderer {
+@@ -275,7 +560,7 @@ class EmailRenderer {
          });
  
          if (addresses.replyTo) {
@@ -560,7 +562,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          }
          return null;
      }
-@@ -314,9 +598,16 @@ class EmailRenderer {
+@@ -314,9 +599,16 @@ class EmailRenderer {
          return allowedSegments;
      }
  
@@ -577,7 +579,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          const renderOptions = {
              target: 'email',
              postUrl
-@@ -360,12 +651,17 @@ class EmailRenderer {
+@@ -360,12 +652,17 @@ class EmailRenderer {
          if (post.get('lexical')) {
              // only lexical's renderer is async
              html = await this.#renderers.lexical.render(
@@ -597,7 +599,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
              );
          }
          return html;
-@@ -507,7 +803,7 @@ class EmailRenderer {
+@@ -507,11 +804,10 @@ class EmailRenderer {
          });
  
          // Add a class to each figcaption so we can style them in the email
@@ -606,6 +608,10 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5
          html = $.html();
  
          // Juice HTML (inline CSS)
+-        const juice = require('juice');
+         html = juice(html, {inlinePseudoElements: true, removeStyleTags: true});
+ 
+         // happens after inlining of CSS so we can change element types without worrying about styling
 @@ -536,15 +832,15 @@ class EmailRenderer {
          $('a').attr('target', '_blank');
  

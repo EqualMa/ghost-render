@@ -168,13 +168,16 @@ patchedDependencies:
     hash: 5e35955fcf8ad342300d61f9739c6bb4da0af838e510f1fc0d78be6ea01ec2fa
     path: patches/@tryghost__html-to-plaintext.patch
   ghost:
-    hash: a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a
+    hash: 1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309
     path: patches/ghost.patch
 
 importers:
 
   .:
     devDependencies:
+      '@ghost-render/rollup-plugin-pkg-json':
+        specifier: 'workspace:'
+        version: link:packages/rollup-plugin-pkg-json
       '@microsoft/api-extractor':
         specifier: ^7.52.8
         version: 7.52.8(@types/node@22.15.30)
@@ -216,7 +219,8 @@ importers:
     devDependencies:
       ghost:
         specifier: 'catalog:'
-        version: 5.121.0(patch_hash=a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+        version: 5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+    publishDirectory: dist
 
   packages/email-renderer-mobiledoc:
     dependencies:
@@ -238,7 +242,8 @@ importers:
         version: link:../email-renderer
       ghost:
         specifier: 'catalog:'
-        version: 5.121.0(patch_hash=a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+        version: 5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+    publishDirectory: dist
 
   packages/full:
     dependencies:
@@ -259,7 +264,7 @@ importers:
         version: 10.1.3
       ghost:
         specifier: 'catalog:'
-        version: 5.121.0(patch_hash=a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+        version: 5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
       handlebars:
         specifier: ^4.7.8
         version: 4.7.8
@@ -272,20 +277,46 @@ importers:
         version: 22.15.30
     publishDirectory: dist
 
+  packages/koenig-node-renderers:
+    dependencies:
+      '@tryghost/kg-clean-basic-html':
+        specifier: ^4.2.5
+        version: 4.2.5
+      '@tryghost/kg-markdown-html-renderer':
+        specifier: ^7.1.2
+        version: 7.1.2
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      luxon:
+        specifier: ^3.6.1
+        version: 3.6.1
+    devDependencies:
+      '@ghost-render/email-renderer':
+        specifier: 'workspace:'
+        version: link:../email-renderer
+      ghost:
+        specifier: 'catalog:'
+        version: 5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+    publishDirectory: dist
+
   packages/lite:
     dependencies:
       '@ghost-render/email-renderer':
         specifier: 'workspace:'
         version: link:../email-renderer
+      '@ghost-render/koenig-node-renderers':
+        specifier: 'workspace:'
+        version: link:../koenig-node-renderers
       '@tryghost/color-utils':
         specifier: ^0.2.6
         version: 0.2.6
       '@tryghost/html-to-plaintext':
         specifier: ^1.0.4
         version: 1.0.4(patch_hash=5e35955fcf8ad342300d61f9739c6bb4da0af838e510f1fc0d78be6ea01ec2fa)
-      '@tryghost/kg-clean-basic-html':
-        specifier: ^4.2.5
-        version: 4.2.5
       '@tryghost/kg-default-cards':
         specifier: ^10.1.3
         version: 10.1.3
@@ -295,12 +326,6 @@ importers:
       '@tryghost/kg-lexical-html-renderer':
         specifier: ^1.3.21
         version: 1.3.21(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))
-      '@tryghost/kg-markdown-html-renderer':
-        specifier: ^7.1.2
-        version: 7.1.2
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       entities:
         specifier: ^4.5.0
         version: 4.5.0
@@ -310,12 +335,6 @@ importers:
       html5parser:
         specifier: ^2.0.2
         version: 2.0.2
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      luxon:
-        specifier: ^3.6.1
-        version: 3.6.1
     devDependencies:
       '@ghost-render/full':
         specifier: 'workspace:'
@@ -325,8 +344,10 @@ importers:
         version: file:node_modules/.pnpm-config/ghost/components/tryghost-i18n-5.121.0.tgz
       ghost:
         specifier: 'catalog:'
-        version: 5.121.0(patch_hash=a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
+        version: 5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
     publishDirectory: dist
+
+  packages/rollup-plugin-pkg-json: {}
 
 packages:
 
@@ -5797,7 +5818,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  ghost@5.121.0(patch_hash=a10c0f29fff4445598a9e6154ba0f4571b1ac8fdb4d204b30ee8d3d59823743a)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21):
+  ghost@5.121.0(patch_hash=1ad2c81163882b173eeb99971387e5e46c3dfd12b9a7d83758b4b09783db9309)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21):
     dependencies:
       '@tryghost/color-utils': 0.2.6
       '@tryghost/html-to-plaintext': 1.0.4(patch_hash=5e35955fcf8ad342300d61f9739c6bb4da0af838e510f1fc0d78be6ea01ec2fa)
