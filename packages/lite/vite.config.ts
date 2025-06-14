@@ -7,8 +7,9 @@ import { analyzer } from "vite-bundle-analyzer";
 import { tsImport } from "tsx/esm/api";
 
 const { default: pkg } = (await tsImport(
-  "@ghost-render/full/vite-config/plugin-pkg",
+  "@ghost-render/rollup-plugin-pkg-json",
   import.meta.url
+)) as typeof import("@ghost-render/rollup-plugin-pkg-json");
 import {
   dependencies,
   devDependencies,

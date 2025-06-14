@@ -1,14 +1,24 @@
 import { defineConfig } from "vite";
 import { dependencies } from "./package.json";
+import { tsImport } from "tsx/esm/api";
 import * as _dts from "unplugin-dts/vite";
 
 const dts = (_dts as unknown as { default: typeof import("unplugin-dts/vite") })
   .default;
 
+const { default: pkg } = (await tsImport(
+  "@ghost-render/rollup-plugin-pkg-json",
+  import.meta.url
+)) as typeof import("@ghost-render/rollup-plugin-pkg-json");
+
 const deps = new Set(Object.keys(dependencies));
 
 export default defineConfig({
-  plugins: [dts()],
+  plugins: [
+    //
+    dts(),
+    pkg(),
+  ],
   build: {
     target: "esnext",
     sourcemap: true,

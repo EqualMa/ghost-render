@@ -27,5 +27,5 @@ export default function makeRenderTemplate({
   handlebarsRuntime.registerPartial("latestPosts", latestPostsPartial);
 
   // Actual template
-  return handlebarsRuntime.compile(htmlTemplateSource);
+  return handlebarsRuntime.template(htmlTemplateSource);
 }

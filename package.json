@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@ghost-render/rollup-plugin-pkg-json": "workspace:",
     "@microsoft/api-extractor": "^7.52.8",
     "rollup": "^4.43.0",
     "rollup-plugin-dts": "^6.2.1",

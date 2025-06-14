@@ -2,11 +2,10 @@
   "name": "@ghost-render/email-renderer-mobiledoc",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
   "dependencies": {
     "@tryghost/kg-mobiledoc-html-renderer": "^7.1.2",
     "@tryghost/kg-card-factory": "^5.1.1",

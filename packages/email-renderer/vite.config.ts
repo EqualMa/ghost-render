@@ -3,10 +3,16 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import { dependencies } from "./package.json";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { tsImport } from "tsx/esm/api";
 import * as _dts from "unplugin-dts/vite";
 
 const dts = (_dts as unknown as { default: typeof import("unplugin-dts/vite") })
   .default;
+
+const { default: pkg } = (await tsImport(
+  "@ghost-render/rollup-plugin-pkg-json",
+  import.meta.url
+)) as typeof import("@ghost-render/rollup-plugin-pkg-json");
 
 const deps = new Set(Object.keys(dependencies));
 
@@ -39,6 +45,7 @@ export default defineConfig({
       bundleTypes: true,
       copyDtsFiles: true,
     }),
+    pkg(),
   ],
   build: {
     target: "esnext",
