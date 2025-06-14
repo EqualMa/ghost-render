@@ -11,7 +11,9 @@ export interface RendererLexicalLabs {
   ): boolean;
 }
 
-const lexicalHtmlRenderer = new LexicalHtmlRenderer({ nodes });
+const lexicalHtmlRenderer = new LexicalHtmlRenderer({
+  nodes: nodes as [],
+});
 
 export default function makeRendererLexical({
   getSiteUrl,

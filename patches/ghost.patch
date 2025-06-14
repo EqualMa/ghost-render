@@ -18,8 +18,37 @@ index 0000000000000000000000000000000000000000..437fa010da76a908550724e70fe81ef7
 +++ b/core/server/models/index.d.ts
 @@ -0,0 +1 @@
 +export const Post: unknown;
+diff --git a/core/server/services/email-address/EmailAddressParser.d.ts b/core/server/services/email-address/EmailAddressParser.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e908eb15a6e74fbbd61055d3cd0259c061e7ed3a
+--- /dev/null
++++ b/core/server/services/email-address/EmailAddressParser.d.ts
+@@ -0,0 +1,2 @@
++export * from "./EmailAddressParser.js.d.ts";
++export { default } from "./EmailAddressParser.js.d.ts";
+diff --git a/core/server/services/email-address/EmailAddressService.ts b/core/server/services/email-address/EmailAddressService.ts
+index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a8da8df31 100644
+--- a/core/server/services/email-address/EmailAddressService.ts
++++ b/core/server/services/email-address/EmailAddressService.ts
+@@ -1,6 +1,6 @@
+ /* eslint-disable ghost/filenames/match-exported-class */
+ import logging from '@tryghost/logging';
+-import EmailAddressParser, {EmailAddress} from './EmailAddressParser.js';
++import EmailAddressParser, {type EmailAddress} from './EmailAddressParser.js';
+ 
+ export type EmailAddresses = {
+     from: EmailAddress,
+@@ -39,6 +39,8 @@ export class EmailAddressService {
+         this.#getDefaultEmail = dependencies.getDefaultEmail;
+         this.#isValidEmailAddress = dependencies.isValidEmailAddress;
+         this.#labs = dependencies.labs;
++
++        this.#labs; // unused
+     }
+ 
+     get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..a4e3e3c7d377b48ebd4949f0f827963748b94fe9 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..7bb127d10cd32502594f6af98fd2a8c5f2f57e95 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,20 +1,16 @@
@@ -142,7 +171,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..a4e3e3c7d377b48ebd4949f0f8279637
 + * @prop {<K extends keyof NewsletterKnownFields>(this: Newsletter, field: K) => NewsletterKnownFields[K]} get
 + *
 + * @typedef {object} NewsletterKnownFields
-+ * @prop {string | undefined | null} sender_reply_to
++ * @prop {string} sender_reply_to
 + * @prop {string | undefined | null} button_corners
 + * @prop {string | undefined | null} button_style
 + * @prop {'normal' | 'medium' | 'semibold' | 'bold' | (string & {}) | null} title_font_weight
@@ -290,7 +319,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..a4e3e3c7d377b48ebd4949f0f8279637
 + *      this: DependenciesEmailAddressService,
 + *      options: {
 + *          from: EmailAddress;
-+ *          replyTo?: { address: string | undefined | null; };
++ *          replyTo?: { address: string; };
 + *      },
 + * ) => { from: EmailAddress, replyTo?: EmailAddress }
 + * } getAddress
@@ -300,7 +329,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..a4e3e3c7d377b48ebd4949f0f8279637
 +/**
 + * @typedef {object} EmailAddress
 + * @prop {string} address
-+ * @prop {string | undefined} name
++ * @prop {string | undefined} [name]
 + */
 +
 +/**

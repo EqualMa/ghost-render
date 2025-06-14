@@ -2,6 +2,6 @@ import type { DependenciesMemberAttributionService } from "@ghost-render/email-r
 import memberAttribution from "ghost/core/server/services/member-attribution";
 
 const memberAttributionService: DependenciesMemberAttributionService =
-  memberAttribution.service;
+  memberAttribution.service!;
 
 export default memberAttributionService;

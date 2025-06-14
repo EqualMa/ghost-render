@@ -1,5 +1,9 @@
 {
-  "extends": "@ghost-render/email-renderer/tsconfig.json",
+  "extends": "../../tsconfig.base",
+  "compilerOptions": {
+    "allowJs": true,
+    "maxNodeModuleJsDepth": 2
+  },
   "include": ["src", "vite-config", "*.ts"],
   "exclude": ["dist"]
 }

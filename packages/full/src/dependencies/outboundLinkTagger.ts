@@ -2,6 +2,6 @@ import type { DependenciesOutboundLinkTagger } from "@ghost-render/email-rendere
 import memberAttribution from "ghost/core/server/services/member-attribution";
 
 const outboundLinkTagger: DependenciesOutboundLinkTagger =
-  memberAttribution.outboundLinkTagger;
+  memberAttribution.outboundLinkTagger!;
 
 export default outboundLinkTagger;
