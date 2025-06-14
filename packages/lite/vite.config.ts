@@ -9,13 +9,16 @@ import { tsImport } from "tsx/esm/api";
 const { default: pkg } = (await tsImport(
   "@ghost-render/full/vite-config/plugin-pkg",
   import.meta.url
-)) as typeof import("@ghost-render/full/vite-config/plugin-pkg");
-import { dependencies, devDependencies } from "./package.json";
+import {
+  dependencies,
+  devDependencies,
+  peerDependencies,
+} from "./package.json";
 import { LITE_MODULES, modulesToEntries } from "./vite-config/modules";
 import makeExternal from "./vite-config/external";
 
 const { deps, bundledDeps, external } = makeExternal({
-  deps: Object.keys(dependencies),
+  deps: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
   bundledDeps: Object.keys(devDependencies),
 });
 // This package will be copied

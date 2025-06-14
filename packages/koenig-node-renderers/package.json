@@ -1,0 +1,23 @@
+{
+  "name": "@ghost-render/koenig-node-renderers",
+  "version": "0.1.0",
+  "type": "module",
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": false
+  },
+  "dependencies": {
+    "@tryghost/kg-markdown-html-renderer": "^7.1.2",
+    "clsx": "^2.1.1",
+    "@tryghost/kg-clean-basic-html": "^4.2.5",
+    "luxon": "^3.6.1",
+    "lodash": "^4.17.21"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "ghost": "catalog:",
+    "@ghost-render/email-renderer": "workspace:"
+  }
+}

@@ -62,7 +62,7 @@ async function getCustomNodeRenderers(labs: {
 
   try {
     const customNodeRenderers = (
-      await import("ghost/core/server/services/koenig/node-renderers")
+      await import("@ghost-render/koenig-node-renderers")
     ).default;
     return customNodeRenderers;
   } catch (err) {
