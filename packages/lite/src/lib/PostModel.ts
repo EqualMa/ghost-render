@@ -5,20 +5,20 @@ import type {
   PostKnownRelations,
 } from "@ghost-render/email-renderer";
 import makeFields from "../makeFields";
-import PostsMetaModel, { type PostsMetaValues } from "./PostsMetaModel";
-import type { AuthorValues } from "./AuthorModel";
+import PostsMetaModel, { type PostsMetaObject } from "./PostsMetaModel";
+import type { AuthorObject } from "./AuthorModel";
 import AuthorModel from "./AuthorModel";
 
 type MaybePromise<T> = Promise<T> | T;
 
-export interface PostValues extends PostKnownFields {
+export interface PostObject extends PostKnownFields {
   id: string;
-  posts_meta: PostsMetaValues;
-  queryAuthors(): MaybePromise<undefined | null | AuthorValues[]>;
+  posts_meta: PostsMetaObject;
+  queryAuthors(): MaybePromise<undefined | null | AuthorObject[]>;
 }
 
 export default class PostModel
-  extends makeFields<PostKnownFields, PostValues>({
+  extends makeFields<PostKnownFields, PostObject>({
     lexical: (p) => p.lexical,
     mobiledoc: (p) => p.mobiledoc,
     visibility: (p) => p.visibility,
@@ -50,12 +50,12 @@ export default class PostModel
 }
 
 const relatedDefs: {
-  [K in keyof PostKnownRelations]: (input: PostValues) => PostKnownRelations[K];
+  [K in keyof PostKnownRelations]: (input: PostObject) => PostKnownRelations[K];
 } = { posts_meta: (input) => new PostsMetaModel(input.posts_meta) };
 
 const lazyRelations: {
   [K in keyof PostKnownLazyRelations]: (
-    input: PostValues
+    input: PostObject
   ) => Promise<PostKnownLazyRelations[K]>;
 } = {
   authors: async (post) => {

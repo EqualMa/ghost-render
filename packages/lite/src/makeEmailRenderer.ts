@@ -12,7 +12,7 @@ import memberAttributionService from "./dependencies/memberAttributionService";
 import audienceFeedbackService from "./dependencies/audienceFeedbackService";
 import emailAddressService from "./dependencies/emailAddressService";
 import outboundLinkTagger from "./dependencies/outboundLinkTagger";
-import Labs, { type LabsValues } from "./lib/Labs";
+import Labs, { type LabsObject } from "./lib/Labs";
 import * as models from "./dependencies/models";
 import makeTFromResources, { type TResources } from "./lib/makeTFromResources";
 import makeRenderers, { type MobiledocMakeRenderer } from "./lib/renderers";
@@ -30,7 +30,7 @@ export default function makeEmailRendererLite({
   settings: Settings;
   settingsHelpers: DependenciesSettingsHelpers;
   urlUtilsOptions: UrlUtilsOptions;
-  labs: LabsValues;
+  labs: LabsObject;
   tResources: TResources;
   mobiledocMakeRenderer: MobiledocMakeRenderer | undefined;
 }): EmailRenderer {

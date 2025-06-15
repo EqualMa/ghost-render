@@ -3,7 +3,7 @@ import type {
   DependenciesLabsKnownKey,
 } from "@ghost-render/email-renderer";
 
-export type LabsValues = { [_ in DependenciesLabsKnownKey]?: boolean };
+export type LabsObject = { [_ in DependenciesLabsKnownKey]?: boolean };
 
 const DEFAULTS: Record<string, boolean | undefined> = {
   i18n: true,
@@ -13,8 +13,8 @@ const DEFAULTS: Record<string, boolean | undefined> = {
 } satisfies Record<DependenciesLabsKnownKey, boolean>;
 
 export default class Labs implements DependenciesLabs {
-  #values: LabsValues | undefined;
-  constructor(values?: LabsValues) {
+  #values: LabsObject | undefined;
+  constructor(values?: LabsObject) {
     this.#values = values;
   }
 

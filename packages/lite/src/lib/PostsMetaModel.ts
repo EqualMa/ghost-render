@@ -4,10 +4,10 @@ import type {
 } from "@ghost-render/email-renderer";
 import makeFields from "../makeFields";
 
-export interface PostsMetaValues extends PostsMetaKnownFields {}
+export interface PostsMetaObject extends PostsMetaKnownFields {}
 
 export default class PostsMetaModel
-  extends makeFields<PostsMetaKnownFields, PostsMetaValues>({
+  extends makeFields<PostsMetaKnownFields, PostsMetaObject>({
     email_subject: (v) => v.email_subject,
     email_only: (v) => v.email_only,
     feature_image_alt: (v) => v.feature_image_alt,
