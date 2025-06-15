@@ -4,6 +4,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://github.com/EqualMa/ghost-render",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EqualMa/ghost-render.git"
+  },
   "scripts": {
     "ws:build": "tsc -b && pnpm run -r build",
     "dev": "vite",
