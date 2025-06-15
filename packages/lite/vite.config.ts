@@ -67,6 +67,48 @@ export default defineConfig({
       },
     },
     pkg(),
+    (() => {
+      let found = false;
+
+      const SOURCE = fileURLToPath(
+        import.meta.resolve(
+          "@ghost-render/full/src/_getDefaultExampleMember.ts"
+        )
+      );
+
+      const V_MOD = "\0virtual:_getDefaultExampleMember";
+
+      const MOD_ID_EmailService =
+        "ghost/core/server/services/email-service/EmailService.js";
+
+      return {
+        name: "EmailService_prototype_getDefaultExampleMember",
+        resolveId: {
+          async handler(source, importer, options) {
+            if (source.includes("_getDefaultExampleMember")) {
+              const resolved = await this.resolve(source, importer, options);
+
+              if (resolved?.id === SOURCE) {
+                return V_MOD;
+              }
+            }
+          },
+          order: "pre",
+        },
+        async load(id) {
+          if (id !== V_MOD) return;
+          found = true;
+          const { default: EmailService } = await import(MOD_ID_EmailService);
+          const source =
+            EmailService.prototype.getDefaultExampleMember.toString();
+
+          return `export default function ${source}`;
+        },
+        buildEnd() {
+          if (!found) this.error(`${SOURCE} should be loaded`);
+        },
+      };
+    })(),
   ],
   build: {
     outDir: "dist",

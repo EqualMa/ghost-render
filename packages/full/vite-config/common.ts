@@ -28,6 +28,8 @@ export type OverridableModuleDescriptions<
 
 export const MODULES = {
   makeEmailRenderer: true,
+  replaceDefinitions: true,
+  getDefaultExampleMember: true,
   dependencies: {
     "": true,
     audienceFeedbackService: true,

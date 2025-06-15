@@ -1237,6 +1237,19 @@ index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9c
 +export type TitleWeight = "400" | "500" | "600" | "700";
 +export type TitleStrongWeight = "700" | "800";
 +export type ButtonBorderRadius = "6px" | "0" | "9999px";
+diff --git a/core/server/services/email-service/EmailService.js b/core/server/services/email-service/EmailService.js
+index 52f1bd82772947374967a905794c9f054a65630d..ed30782ac38e2240c69731cac0defc9f98c70734 100644
+--- a/core/server/services/email-service/EmailService.js
++++ b/core/server/services/email-service/EmailService.js
+@@ -7,6 +7,8 @@
+  * @typedef {{checkVerificationRequired(): Promise<boolean>}} VerificationTrigger
+  */
+ 
++function require() {}
++
+ const BatchSendingService = require('./BatchSendingService');
+ const errors = require('@tryghost/errors');
+ const tpl = require('@tryghost/tpl');
 diff --git a/core/server/services/email-service/email-templates/template.hbs b/core/server/services/email-service/email-templates/template.hbs
 index 2a6e6b68023ca56c5faa0b3092542a2437d6cc50..3569ad0b55b15c8e96ba3cd247fbf283253e68f5 100644
 --- a/core/server/services/email-service/email-templates/template.hbs
