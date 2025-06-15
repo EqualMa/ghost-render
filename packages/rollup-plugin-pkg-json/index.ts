@@ -1,6 +1,11 @@
-import type { Plugin } from "rollup";
+import * as path from "node:path";
+import type { Plugin, RollupFsModule } from "rollup";
 
-const DEFAULT_REMOVED_PROPERTIES = ["scripts", "devDependencies"];
+const DEFAULT_REMOVED_PROPERTIES = [
+  "scripts",
+  "devDependencies",
+  "publishConfig",
+];
 const DEFAULT_INCLUDED_DEPS = ["dependencies", "peerDependencies"];
 const DEFAULT_INPUT_PKG_JSON_PATH = "package.json";
 const DEFAULT_OUTPUT_PKG_JSON_PATH = "package.json";
@@ -33,6 +38,30 @@ export default function pkg(): Plugin {
 
       for (const prop of removedProps) {
         delete original[prop];
+      }
+
+      if (!original.homepage || !original.repository) {
+        const projRoot = await queryWorkspaceRootPackageJson(this.fs);
+        if (projRoot) {
+          const rootPkgJson = JSON.parse(projRoot.rootPackageJsonContent) || {};
+          if (!original.homepage && rootPkgJson.homepage)
+            original.homepage = rootPkgJson.homepage;
+          if (
+            !original.repository &&
+            rootPkgJson.repository &&
+            typeof rootPkgJson.repository === "object" &&
+            !rootPkgJson.repository.directory
+          ) {
+            const directory = path.relative(
+              projRoot.directory,
+              path.dirname(pkgJsonPath)
+            );
+            original.repository = {
+              ...rootPkgJson.repository,
+              directory,
+            };
+          }
+        }
       }
 
       this.emitFile({
@@ -144,4 +173,33 @@ function importPathToPackage(imported: string): string {
   }
 
   return pkg;
+}
+
+const ROOT_FILE = "pnpm-workspace.yaml";
+
+const MAX_QUERY_DEPTH = 10;
+async function queryWorkspaceRootPackageJson(
+  fs: RollupFsModule
+): Promise<{ directory: string; rootPackageJsonContent: string } | undefined> {
+  let i = 0;
+  let curDir = "./";
+  while (i < MAX_QUERY_DEPTH) {
+    i++;
+    // TODO: only suppress ENOENT
+    if (await fs.stat(`${curDir}${ROOT_FILE}`).catch(() => undefined)) {
+      const pkgJsonContent = await fs
+        .readFile(`${curDir}package.json`, { encoding: "utf8" })
+        .catch(() => undefined);
+
+      return pkgJsonContent
+        ? {
+            directory: curDir,
+            rootPackageJsonContent: pkgJsonContent,
+          }
+        : undefined;
+    }
+    curDir = curDir + "../";
+  }
+
+  return undefined;
 }

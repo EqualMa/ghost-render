@@ -209,8 +209,6 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(vite@6.3.5(@types/node@22.15.30)(tsx@4.20.1))
 
-  packages/core: {}
-
   packages/email-renderer:
     dependencies:
       cheerio:
@@ -350,7 +348,11 @@ importers:
         version: 5.121.0(patch_hash=bc7a6ba2b720bbb5d3cf0ce5e41fb5eb4161245ced28c61c5c30ea1e86c9fe43)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
     publishDirectory: dist
 
-  packages/rollup-plugin-pkg-json: {}
+  packages/rollup-plugin-pkg-json:
+    devDependencies:
+      '@types/node':
+        specifier: '*'
+        version: 22.15.30
 
 packages:
 
