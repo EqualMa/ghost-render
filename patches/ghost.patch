@@ -48,7 +48,7 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f76695904 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508ebd88158 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,20 +1,19 @@
@@ -207,7 +207,15 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
   */
  
  /**
-@@ -115,7 +169,205 @@ function cheerioLoad(html) {
+@@ -106,6 +160,7 @@ function cheerioLoad(html) {
+ /**
+  * @typedef {object} EmailRenderOptions
+  * @prop {boolean} clickTrackingEnabled
++ * @prop {boolean} [unsubscribeUrlDisabled]
+  */
+ 
+ /**
+@@ -115,7 +170,205 @@ function cheerioLoad(html) {
   * @prop {ReplacementDefinition[]} replacements
   */
  
@@ -413,7 +421,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #settingsCache;
      #settingsHelpers;
  
-@@ -126,7 +378,6 @@ class EmailRenderer {
+@@ -126,7 +379,6 @@ class EmailRenderer {
      #getPostUrl;
      #storageUtils;
  
@@ -421,7 +429,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #renderTemplate;
      #linkReplacer;
      #linkTracking;
-@@ -140,26 +391,28 @@ class EmailRenderer {
+@@ -140,26 +392,28 @@ class EmailRenderer {
  
      /**
       * @param {object} dependencies
@@ -464,7 +472,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          settingsCache,
          settingsHelpers,
          renderers,
-@@ -175,8 +428,10 @@ class EmailRenderer {
+@@ -175,8 +429,10 @@ class EmailRenderer {
          outboundLinkTagger,
          labs,
          models,
@@ -476,7 +484,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          this.#settingsCache = settingsCache;
          this.#settingsHelpers = settingsHelpers;
          this.#renderers = renderers;
-@@ -193,14 +448,38 @@ class EmailRenderer {
+@@ -193,14 +449,38 @@ class EmailRenderer {
          this.#labs = labs;
          this.#models = models;
          this.#t = t;
@@ -515,7 +523,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          let senderName = this.#settingsCache.get('title') ? this.#settingsCache.get('title').replace(/"/g, '\\"') : '';
          if (newsletter.get('sender_name')) {
              senderName = newsletter.get('sender_name');
-@@ -215,7 +494,7 @@ class EmailRenderer {
+@@ -215,7 +495,7 @@ class EmailRenderer {
          if (process.env.NODE_ENV !== 'production') {
              if (/@localhost$/.test(fromAddress) || /@ghost.local$/.test(fromAddress)) {
                  const localAddress = 'localhost@example.com';
@@ -524,7 +532,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  fromAddress = localAddress;
              }
          }
-@@ -237,20 +516,25 @@ class EmailRenderer {
+@@ -237,20 +517,25 @@ class EmailRenderer {
          locale = locale.trim();
  
          // If the locale is just "en", or is not valid, revert to default
@@ -552,7 +560,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      }
  
      /**
-@@ -275,7 +559,7 @@ class EmailRenderer {
+@@ -275,7 +560,7 @@ class EmailRenderer {
          });
  
          if (addresses.replyTo) {
@@ -561,7 +569,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          }
          return null;
      }
-@@ -314,9 +598,16 @@ class EmailRenderer {
+@@ -314,9 +599,16 @@ class EmailRenderer {
          return allowedSegments;
      }
  
@@ -578,7 +586,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          const renderOptions = {
              target: 'email',
              postUrl
-@@ -360,12 +651,17 @@ class EmailRenderer {
+@@ -360,12 +652,17 @@ class EmailRenderer {
          if (post.get('lexical')) {
              // only lexical's renderer is async
              html = await this.#renderers.lexical.render(
@@ -598,7 +606,17 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              );
          }
          return html;
-@@ -507,11 +803,10 @@ class EmailRenderer {
+@@ -421,6 +718,9 @@ class EmailRenderer {
+         html = $.html();
+ 
+         const templateData = await this.getTemplateData({
++            __ghostRenderCustomization__: {
++                unsubscribeUrlDisabled: options.unsubscribeUrlDisabled,
++            },
+             post,
+             newsletter,
+             html,
+@@ -507,11 +807,10 @@ class EmailRenderer {
          });
  
          // Add a class to each figcaption so we can style them in the email
@@ -611,7 +629,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          html = juice(html, {inlinePseudoElements: true, removeStyleTags: true});
  
          // happens after inlining of CSS so we can change element types without worrying about styling
-@@ -536,15 +831,15 @@ class EmailRenderer {
+@@ -536,15 +835,15 @@ class EmailRenderer {
          $('a').attr('target', '_blank');
  
          // convert figure and figcaption to div so that Outlook applies margins
@@ -630,7 +648,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  $(elem).remove();
              });
          }
-@@ -558,7 +853,7 @@ class EmailRenderer {
+@@ -558,7 +857,7 @@ class EmailRenderer {
          // TODO: normalizeReplacementStrings (replace unsupported replacement strings)
  
          // Convert HTML to plaintext
@@ -639,7 +657,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
  
          // Fix any unsupported chars in Outlook
          html = html.replace(/&apos;/g, '&#39;');
-@@ -580,12 +875,11 @@ class EmailRenderer {
+@@ -580,12 +879,11 @@ class EmailRenderer {
       * Takes a member and newsletter uuid. Returns the url that should be used to unsubscribe
       * In case of no member uuid, generates the preview unsubscribe url - `?preview=1`
       *
@@ -656,7 +674,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          return this.#settingsHelpers.createUnsubscribeUrl(uuid, options);
      }
  
-@@ -595,6 +889,7 @@ class EmailRenderer {
+@@ -595,6 +893,7 @@ class EmailRenderer {
       * @param {string} [uuid] member uuid
       */
      createManageAccountUrl(uuid) {
@@ -664,7 +682,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          const siteUrl = this.#urlUtils.urlFor('home', true);
          const url = new URL(siteUrl);
          url.hash = '#/portal/account';
-@@ -604,6 +899,8 @@ class EmailRenderer {
+@@ -604,6 +903,8 @@ class EmailRenderer {
  
      /**
       * Returns whether a paid member is trialing a subscription
@@ -673,7 +691,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
       */
      isMemberTrialing(member) {
          // Do we have an active subscription?
-@@ -666,11 +963,11 @@ class EmailRenderer {
+@@ -666,11 +967,11 @@ class EmailRenderer {
              const timezone = this.#settingsCache.get('timezone');
              // Translate to a human readable string
              if (activeSubscription.trial_end_at && activeSubscription.trial_end_at > new Date() && activeSubscription.status === 'trialing') {
@@ -687,7 +705,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              if (activeSubscription.cancel_at_period_end) {
                  return t(messages.subscriptionStatus.canceled, {date});
              }
-@@ -681,7 +978,7 @@ class EmailRenderer {
+@@ -681,7 +982,7 @@ class EmailRenderer {
  
          if (expires) {
              const timezone = this.#settingsCache.get('timezone');
@@ -696,7 +714,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              return t(messages.subscriptionStatus.complimentaryExpires, {date});
          }
  
-@@ -690,17 +987,21 @@ class EmailRenderer {
+@@ -690,17 +991,21 @@ class EmailRenderer {
  
      /**
       * Note that we only look in HTML because plaintext and HTML are essentially the same content
@@ -719,7 +737,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  }
              },
              {
-@@ -718,7 +1019,10 @@ class EmailRenderer {
+@@ -718,7 +1023,10 @@ class EmailRenderer {
              {
                  id: 'key',
                  getValue: (member) => {
@@ -731,7 +749,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  }
              },
              {
-@@ -749,7 +1053,7 @@ class EmailRenderer {
+@@ -749,7 +1057,7 @@ class EmailRenderer {
                  id: 'created_at',
                  getValue: (member) => {
                      const timezone = this.#settingsCache.get('timezone');
@@ -740,7 +758,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  }
              },
              {
-@@ -776,7 +1080,7 @@ class EmailRenderer {
+@@ -776,7 +1084,7 @@ class EmailRenderer {
              {
                  id: 'list_unsubscribe',
                  getValue: (member) => {
@@ -749,7 +767,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  },
                  required: true // Used in email headers
              }
-@@ -787,8 +1091,10 @@ class EmailRenderer {
+@@ -787,8 +1095,10 @@ class EmailRenderer {
          const REPLACEMENT_STRING_REGEX = /^(?<recipientProperty>\w+?)(?:,? *(?:"|&quot;)(?<fallback>.*?)(?:"|&quot;))?$/;
  
          // Stores the definitions that we are actually going to use
@@ -760,7 +778,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          let result;
          while ((result = EMAIL_REPLACEMENT_REGEX.exec(html)) !== null) {
              const [replacementMatch, replacementStr] = result;
-@@ -800,7 +1106,7 @@ class EmailRenderer {
+@@ -800,7 +1110,7 @@ class EmailRenderer {
              const match = replacementStr.match(REPLACEMENT_STRING_REGEX);
  
              if (match) {
@@ -769,7 +787,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  const definition = baseDefinitions.find(d => d.id === recipientProperty);
  
                  if (definition) {
-@@ -842,37 +1148,20 @@ class EmailRenderer {
+@@ -842,37 +1152,20 @@ class EmailRenderer {
          return this.#labs;
      }
  
@@ -816,7 +834,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
       */
      #getEmailPreheader(postModel, segment, html) {
          let plaintext = postModel.get('plaintext');
-@@ -885,7 +1174,7 @@ class EmailRenderer {
+@@ -885,7 +1178,7 @@ class EmailRenderer {
                  // so we use the provided HTML to generate the plaintext as this
                  // should have already had the paid content removed
                  if (segment === 'status:free') {
@@ -825,7 +843,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  }
                  return plaintext.substring(0, 500);
              } else {
-@@ -894,6 +1183,11 @@ class EmailRenderer {
+@@ -894,6 +1187,11 @@ class EmailRenderer {
          }
      }
  
@@ -837,7 +855,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      truncateText(text, maxLength) {
          if (text && text.length > maxLength) {
              return text.substring(0, maxLength - 1).trim() + '…';
-@@ -904,10 +1198,10 @@ class EmailRenderer {
+@@ -904,10 +1202,10 @@ class EmailRenderer {
  
      /**
       *
@@ -850,7 +868,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
       */
      truncateHtml(text, maxLength, maxLengthMobile) {
          if (!maxLengthMobile || maxLength <= maxLengthMobile) {
-@@ -928,13 +1222,17 @@ class EmailRenderer {
+@@ -928,13 +1226,17 @@ class EmailRenderer {
          }
      }
  
@@ -869,7 +887,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              return value;
          }
  
-@@ -946,13 +1244,18 @@ class EmailRenderer {
+@@ -946,13 +1248,18 @@ class EmailRenderer {
          return '#ffffff';
      }
  
@@ -889,7 +907,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              return value;
          }
  
-@@ -962,9 +1265,14 @@ class EmailRenderer {
+@@ -962,9 +1269,14 @@ class EmailRenderer {
  
          // value === 'auto', value === null, value is not valid hex
          const backgroundColor = this.#getBackgroundColor(newsletter);
@@ -905,7 +923,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #getSectionTitleColor(newsletter, accentColor) {
          const labs = this.getLabs();
          if (!labs?.isSet('emailCustomization') && !labs?.isSet('emailCustomizationAlpha')) {
-@@ -975,7 +1283,7 @@ class EmailRenderer {
+@@ -975,7 +1287,7 @@ class EmailRenderer {
          const value = newsletter.get('section_title_color');
          const validHex = /#([0-9a-f]{3}){1,2}$/i;
  
@@ -914,7 +932,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              return value;
          }
  
-@@ -986,13 +1294,17 @@ class EmailRenderer {
+@@ -986,13 +1298,17 @@ class EmailRenderer {
          return null;
      }
  
@@ -934,7 +952,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
  
          const labs = this.getLabs();
          if (!labs?.isSet('emailCustomizationAlpha') && !labs?.isSet('emailCustomization')) {
-@@ -1002,9 +1314,13 @@ class EmailRenderer {
+@@ -1002,9 +1318,13 @@ class EmailRenderer {
          /** @type {'normal' | 'medium' | 'semibold' | 'bold' | string | null} */
          const settingValue = newsletter.get('title_font_weight');
  
@@ -949,7 +967,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #getTitleStrongWeight(titleWeight) {
          const numericWeight = parseInt(titleWeight, 10);
  
-@@ -1021,6 +1337,10 @@ class EmailRenderer {
+@@ -1021,6 +1341,10 @@ class EmailRenderer {
          }
      }
  
@@ -960,7 +978,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #getImageCorners(newsletter) {
          const value = newsletter.get('image_corners');
          if (value === 'rounded') {
-@@ -1029,6 +1349,10 @@ class EmailRenderer {
+@@ -1029,6 +1353,10 @@ class EmailRenderer {
          return false;
      }
  
@@ -971,7 +989,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
      #getDividerColor(newsletter) {
          const labs = this.getLabs();
  
-@@ -1038,7 +1362,7 @@ class EmailRenderer {
+@@ -1038,7 +1366,7 @@ class EmailRenderer {
  
              if (value === 'accent') {
                  return this.#settingsCache.get('accent_color');
@@ -980,11 +998,12 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
                  return value;
              }
          }
-@@ -1049,6 +1373,13 @@ class EmailRenderer {
+@@ -1049,35 +1377,51 @@ class EmailRenderer {
  
      /**
       * @private
 +     * @param {object} options
++     * @param {{ unsubscribeUrlDisabled?: boolean }=} options.__ghostRenderCustomization__
 +     * @param {Post} options.post
 +     * @param {Newsletter} options.newsletter
 +     * @param {string} options.html
@@ -992,9 +1011,18 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
 +     * @param {Segment} options.segment
 +     * @returns {Promise<TemplateData>}
       */
-     async getTemplateData({post, newsletter, html, addPaywall, segment}) {
+-    async getTemplateData({post, newsletter, html, addPaywall, segment}) {
++    async getTemplateData({
++        __ghostRenderCustomization__,
++        post,
++        newsletter,
++        html,
++        addPaywall,
++        segment,
++    }) {
          const labs = this.getLabs();
-@@ -1057,27 +1388,28 @@ class EmailRenderer {
+ 
+         let accentColor = this.#settingsCache.get('accent_color') || '#15212A';
          let adjustedAccentColor;
          let adjustedAccentContrastColor;
          try {
@@ -1029,7 +1057,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          let buttonBorderRadius = '6px';
          if (hasAnyEmailCustomization) {
              if (newsletter.get('button_corners') === 'square') {
-@@ -1094,12 +1426,9 @@ class EmailRenderer {
+@@ -1094,12 +1438,9 @@ class EmailRenderer {
  
          const timezone = this.#settingsCache.get('timezone');
          const locale = this.#getValidLocale();
@@ -1044,7 +1072,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          let authors;
          const postAuthors = await post.getLazyRelation('authors');
          if (postAuthors?.models) {
-@@ -1135,6 +1464,7 @@ class EmailRenderer {
+@@ -1135,6 +1476,7 @@ class EmailRenderer {
  
          const hasEmailOnlyFlag = post.related('posts_meta')?.get('email_only') ?? false;
  
@@ -1052,15 +1080,17 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
          const latestPosts = [];
          let latestPostsHasImages = false;
          if (newsletter.get('show_latest_posts')) {
-@@ -1184,6 +1514,7 @@ class EmailRenderer {
+@@ -1184,7 +1526,9 @@ class EmailRenderer {
  
          const linkStyle = (hasAnyEmailCustomization && newsletter.get('link_style')) || 'underline';
  
 +        /** @type {TemplateData} */
          const data = {
++            __ghostRenderCustomization__,
              site: {
                  title: this.#settingsCache.get('title'),
-@@ -1278,7 +1609,11 @@ class EmailRenderer {
+                 url: this.#urlUtils.urlFor('home', true),
+@@ -1278,7 +1622,11 @@ class EmailRenderer {
      /**
       * @private
       * Sets and limits the width of an image + returns the width
@@ -1073,7 +1103,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
       */
      async limitImageWidth(href, visibleWidth = 600, visibleHeight = null) {
          if (!href) {
-@@ -1288,7 +1623,7 @@ class EmailRenderer {
+@@ -1288,7 +1636,7 @@ class EmailRenderer {
                  height: null
              };
          }
@@ -1082,7 +1112,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              // Unsplash images have a minimum size so assuming 1200px is safe
              const unsplashUrl = new URL(href);
              unsplashUrl.searchParams.delete('w');
-@@ -1341,7 +1676,7 @@ class EmailRenderer {
+@@ -1341,7 +1689,7 @@ class EmailRenderer {
                  };
              } catch (err) {
                  // log and proceed. Using original header image without fixed width isn't fatal.
@@ -1091,7 +1121,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
              }
          }
  
-@@ -1353,4 +1688,6 @@ class EmailRenderer {
+@@ -1353,4 +1701,6 @@ class EmailRenderer {
      }
  }
  
@@ -1101,10 +1131,10 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f
 +/** @typedef {ConstructorParameters<typeof EmailRenderer>[0]} Dependencies */
 diff --git a/core/server/services/email-service/EmailRendererTypes.d.ts b/core/server/services/email-service/EmailRendererTypes.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf542313ca
+index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9cf5127993
 --- /dev/null
 +++ b/core/server/services/email-service/EmailRendererTypes.d.ts
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,102 @@
 +export interface TemplateData {
 +  site: {
 +    title: string;
@@ -1152,8 +1182,8 @@ index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf
 +  linkColor: string;
 +  hasRoundedImageCorners: boolean;
 +  buttonBorderRadius: ButtonBorderRadius;
-+  sectionTitleColor: string|null;
-+  headerImage: string|undefined|null;
++  sectionTitleColor: string | null;
++  headerImage: string | undefined | null;
 +  headerImageWidth: number;
 +  showHeaderIcon: false | string;
 +  dividerColor: string;
@@ -1161,7 +1191,7 @@ index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf
 +  showHeaderTitle: boolean;
 +  showHeaderName: boolean;
 +  showFeatureImage: boolean;
-+  footerContent: string|undefined|null;
++  footerContent: string | undefined | null;
 +  linkStyle: string;
 +  hasOutlineButtons: boolean;
 +
@@ -1186,6 +1216,10 @@ index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf
 +  } | null;
 +
 +  year: string;
++
++  __ghostRenderCustomization__?: {
++    unsubscribeUrlDisabled?: boolean;
++  };
 +}
 +
 +export interface LatestPost {
@@ -1200,10 +1234,27 @@ index 0000000000000000000000000000000000000000..4d0455e775247d2ffe22ee2540b5ebcf
 +  excerpt: string;
 +}
 +
-+export type TitleWeight = '400' | '500' | '600' | '700';
-+export type TitleStrongWeight='700' | '800';
-+export type ButtonBorderRadius ='6px'|'0'|'9999px';
-\ No newline at end of file
++export type TitleWeight = "400" | "500" | "600" | "700";
++export type TitleStrongWeight = "700" | "800";
++export type ButtonBorderRadius = "6px" | "0" | "9999px";
+diff --git a/core/server/services/email-service/email-templates/template.hbs b/core/server/services/email-service/email-templates/template.hbs
+index 2a6e6b68023ca56c5faa0b3092542a2437d6cc50..3569ad0b55b15c8e96ba3cd247fbf283253e68f5 100644
+--- a/core/server/services/email-service/email-templates/template.hbs
++++ b/core/server/services/email-service/email-templates/template.hbs
+@@ -208,7 +208,12 @@
+                                             <tr><td class="footer">{{{footerContent}}}</td></tr>
+                                         {{/if}}
+                                         <tr>
+-                                            <td class="footer">{{site.title}} &copy; {{year}} – <a href="%%{unsubscribe_url}%%">{{t 'Unsubscribe'}}</a></td>
++                                            <td class="footer">
++                                                {{site.title}} &copy; {{year}}
++                                                {{#unless __ghostRenderCustomization__.unsubscribeUrlDisabled}}
++                                                – <a href="%%{unsubscribe_url}%%">{{t 'Unsubscribe'}}</a>
++                                                {{/unless}}
++                                            </td>
+                                         </tr>
+ 
+                                         {{#if showBadge }}
 diff --git a/core/server/services/email-service/helpers/register-helpers.d.ts b/core/server/services/email-service/helpers/register-helpers.d.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..35ea3134b22713363c05a3ab28700cb78e0dfaff
