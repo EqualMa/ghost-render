@@ -11,6 +11,7 @@
   },
   "scripts": {
     "ws:build": "tsc -b && pnpm run -r build",
+    "ci:publish": "pnpm publish -r --access=public",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
