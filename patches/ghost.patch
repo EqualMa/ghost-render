@@ -48,7 +48,7 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a6af7ee60 100644
+index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..fd14746c77665992b12686c01d798c3f76695904 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,20 +1,19 @@
@@ -93,7 +93,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
  function escapeHtml(unsafe) {
      return unsafe
          .replace(/&/g, '&amp;')
-@@ -40,38 +43,90 @@ function escapeHtml(unsafe) {
+@@ -40,38 +43,89 @@ function escapeHtml(unsafe) {
          .replace(/'/g, '&#039;');
  }
  
@@ -204,11 +204,10 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
 + * @prop {boolean} show_header_name
 + * @prop {boolean} show_feature_image
 + * @prop {string | undefined | null} footer_content
-+ * @prop {boolean} show_feature_image
   */
  
  /**
-@@ -115,7 +170,205 @@ function cheerioLoad(html) {
+@@ -115,7 +169,205 @@ function cheerioLoad(html) {
   * @prop {ReplacementDefinition[]} replacements
   */
  
@@ -414,7 +413,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #settingsCache;
      #settingsHelpers;
  
-@@ -126,7 +379,6 @@ class EmailRenderer {
+@@ -126,7 +378,6 @@ class EmailRenderer {
      #getPostUrl;
      #storageUtils;
  
@@ -422,7 +421,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #renderTemplate;
      #linkReplacer;
      #linkTracking;
-@@ -140,26 +392,28 @@ class EmailRenderer {
+@@ -140,26 +391,28 @@ class EmailRenderer {
  
      /**
       * @param {object} dependencies
@@ -465,7 +464,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          settingsCache,
          settingsHelpers,
          renderers,
-@@ -175,8 +429,10 @@ class EmailRenderer {
+@@ -175,8 +428,10 @@ class EmailRenderer {
          outboundLinkTagger,
          labs,
          models,
@@ -477,7 +476,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          this.#settingsCache = settingsCache;
          this.#settingsHelpers = settingsHelpers;
          this.#renderers = renderers;
-@@ -193,14 +449,38 @@ class EmailRenderer {
+@@ -193,14 +448,38 @@ class EmailRenderer {
          this.#labs = labs;
          this.#models = models;
          this.#t = t;
@@ -516,7 +515,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          let senderName = this.#settingsCache.get('title') ? this.#settingsCache.get('title').replace(/"/g, '\\"') : '';
          if (newsletter.get('sender_name')) {
              senderName = newsletter.get('sender_name');
-@@ -215,7 +495,7 @@ class EmailRenderer {
+@@ -215,7 +494,7 @@ class EmailRenderer {
          if (process.env.NODE_ENV !== 'production') {
              if (/@localhost$/.test(fromAddress) || /@ghost.local$/.test(fromAddress)) {
                  const localAddress = 'localhost@example.com';
@@ -525,7 +524,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  fromAddress = localAddress;
              }
          }
-@@ -237,20 +517,25 @@ class EmailRenderer {
+@@ -237,20 +516,25 @@ class EmailRenderer {
          locale = locale.trim();
  
          // If the locale is just "en", or is not valid, revert to default
@@ -553,7 +552,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      }
  
      /**
-@@ -275,7 +560,7 @@ class EmailRenderer {
+@@ -275,7 +559,7 @@ class EmailRenderer {
          });
  
          if (addresses.replyTo) {
@@ -562,7 +561,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          }
          return null;
      }
-@@ -314,9 +599,16 @@ class EmailRenderer {
+@@ -314,9 +598,16 @@ class EmailRenderer {
          return allowedSegments;
      }
  
@@ -579,7 +578,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          const renderOptions = {
              target: 'email',
              postUrl
-@@ -360,12 +652,17 @@ class EmailRenderer {
+@@ -360,12 +651,17 @@ class EmailRenderer {
          if (post.get('lexical')) {
              // only lexical's renderer is async
              html = await this.#renderers.lexical.render(
@@ -599,7 +598,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              );
          }
          return html;
-@@ -507,11 +804,10 @@ class EmailRenderer {
+@@ -507,11 +803,10 @@ class EmailRenderer {
          });
  
          // Add a class to each figcaption so we can style them in the email
@@ -612,7 +611,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          html = juice(html, {inlinePseudoElements: true, removeStyleTags: true});
  
          // happens after inlining of CSS so we can change element types without worrying about styling
-@@ -536,15 +832,15 @@ class EmailRenderer {
+@@ -536,15 +831,15 @@ class EmailRenderer {
          $('a').attr('target', '_blank');
  
          // convert figure and figcaption to div so that Outlook applies margins
@@ -631,7 +630,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  $(elem).remove();
              });
          }
-@@ -558,7 +854,7 @@ class EmailRenderer {
+@@ -558,7 +853,7 @@ class EmailRenderer {
          // TODO: normalizeReplacementStrings (replace unsupported replacement strings)
  
          // Convert HTML to plaintext
@@ -640,7 +639,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
  
          // Fix any unsupported chars in Outlook
          html = html.replace(/&apos;/g, '&#39;');
-@@ -580,12 +876,11 @@ class EmailRenderer {
+@@ -580,12 +875,11 @@ class EmailRenderer {
       * Takes a member and newsletter uuid. Returns the url that should be used to unsubscribe
       * In case of no member uuid, generates the preview unsubscribe url - `?preview=1`
       *
@@ -657,7 +656,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          return this.#settingsHelpers.createUnsubscribeUrl(uuid, options);
      }
  
-@@ -595,6 +890,7 @@ class EmailRenderer {
+@@ -595,6 +889,7 @@ class EmailRenderer {
       * @param {string} [uuid] member uuid
       */
      createManageAccountUrl(uuid) {
@@ -665,7 +664,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          const siteUrl = this.#urlUtils.urlFor('home', true);
          const url = new URL(siteUrl);
          url.hash = '#/portal/account';
-@@ -604,6 +900,8 @@ class EmailRenderer {
+@@ -604,6 +899,8 @@ class EmailRenderer {
  
      /**
       * Returns whether a paid member is trialing a subscription
@@ -674,7 +673,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
       */
      isMemberTrialing(member) {
          // Do we have an active subscription?
-@@ -666,11 +964,11 @@ class EmailRenderer {
+@@ -666,11 +963,11 @@ class EmailRenderer {
              const timezone = this.#settingsCache.get('timezone');
              // Translate to a human readable string
              if (activeSubscription.trial_end_at && activeSubscription.trial_end_at > new Date() && activeSubscription.status === 'trialing') {
@@ -688,7 +687,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              if (activeSubscription.cancel_at_period_end) {
                  return t(messages.subscriptionStatus.canceled, {date});
              }
-@@ -681,7 +979,7 @@ class EmailRenderer {
+@@ -681,7 +978,7 @@ class EmailRenderer {
  
          if (expires) {
              const timezone = this.#settingsCache.get('timezone');
@@ -697,7 +696,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              return t(messages.subscriptionStatus.complimentaryExpires, {date});
          }
  
-@@ -690,17 +988,21 @@ class EmailRenderer {
+@@ -690,17 +987,21 @@ class EmailRenderer {
  
      /**
       * Note that we only look in HTML because plaintext and HTML are essentially the same content
@@ -720,7 +719,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  }
              },
              {
-@@ -718,7 +1020,10 @@ class EmailRenderer {
+@@ -718,7 +1019,10 @@ class EmailRenderer {
              {
                  id: 'key',
                  getValue: (member) => {
@@ -732,7 +731,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  }
              },
              {
-@@ -749,7 +1054,7 @@ class EmailRenderer {
+@@ -749,7 +1053,7 @@ class EmailRenderer {
                  id: 'created_at',
                  getValue: (member) => {
                      const timezone = this.#settingsCache.get('timezone');
@@ -741,7 +740,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  }
              },
              {
-@@ -776,7 +1081,7 @@ class EmailRenderer {
+@@ -776,7 +1080,7 @@ class EmailRenderer {
              {
                  id: 'list_unsubscribe',
                  getValue: (member) => {
@@ -750,7 +749,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  },
                  required: true // Used in email headers
              }
-@@ -787,8 +1092,10 @@ class EmailRenderer {
+@@ -787,8 +1091,10 @@ class EmailRenderer {
          const REPLACEMENT_STRING_REGEX = /^(?<recipientProperty>\w+?)(?:,? *(?:"|&quot;)(?<fallback>.*?)(?:"|&quot;))?$/;
  
          // Stores the definitions that we are actually going to use
@@ -761,7 +760,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          let result;
          while ((result = EMAIL_REPLACEMENT_REGEX.exec(html)) !== null) {
              const [replacementMatch, replacementStr] = result;
-@@ -800,7 +1107,7 @@ class EmailRenderer {
+@@ -800,7 +1106,7 @@ class EmailRenderer {
              const match = replacementStr.match(REPLACEMENT_STRING_REGEX);
  
              if (match) {
@@ -770,7 +769,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  const definition = baseDefinitions.find(d => d.id === recipientProperty);
  
                  if (definition) {
-@@ -842,37 +1149,20 @@ class EmailRenderer {
+@@ -842,37 +1148,20 @@ class EmailRenderer {
          return this.#labs;
      }
  
@@ -817,7 +816,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
       */
      #getEmailPreheader(postModel, segment, html) {
          let plaintext = postModel.get('plaintext');
-@@ -885,7 +1175,7 @@ class EmailRenderer {
+@@ -885,7 +1174,7 @@ class EmailRenderer {
                  // so we use the provided HTML to generate the plaintext as this
                  // should have already had the paid content removed
                  if (segment === 'status:free') {
@@ -826,7 +825,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  }
                  return plaintext.substring(0, 500);
              } else {
-@@ -894,6 +1184,11 @@ class EmailRenderer {
+@@ -894,6 +1183,11 @@ class EmailRenderer {
          }
      }
  
@@ -838,7 +837,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      truncateText(text, maxLength) {
          if (text && text.length > maxLength) {
              return text.substring(0, maxLength - 1).trim() + '…';
-@@ -904,10 +1199,10 @@ class EmailRenderer {
+@@ -904,10 +1198,10 @@ class EmailRenderer {
  
      /**
       *
@@ -851,7 +850,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
       */
      truncateHtml(text, maxLength, maxLengthMobile) {
          if (!maxLengthMobile || maxLength <= maxLengthMobile) {
-@@ -928,13 +1223,17 @@ class EmailRenderer {
+@@ -928,13 +1222,17 @@ class EmailRenderer {
          }
      }
  
@@ -870,7 +869,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              return value;
          }
  
-@@ -946,13 +1245,18 @@ class EmailRenderer {
+@@ -946,13 +1244,18 @@ class EmailRenderer {
          return '#ffffff';
      }
  
@@ -890,7 +889,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              return value;
          }
  
-@@ -962,9 +1266,14 @@ class EmailRenderer {
+@@ -962,9 +1265,14 @@ class EmailRenderer {
  
          // value === 'auto', value === null, value is not valid hex
          const backgroundColor = this.#getBackgroundColor(newsletter);
@@ -906,7 +905,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #getSectionTitleColor(newsletter, accentColor) {
          const labs = this.getLabs();
          if (!labs?.isSet('emailCustomization') && !labs?.isSet('emailCustomizationAlpha')) {
-@@ -975,7 +1284,7 @@ class EmailRenderer {
+@@ -975,7 +1283,7 @@ class EmailRenderer {
          const value = newsletter.get('section_title_color');
          const validHex = /#([0-9a-f]{3}){1,2}$/i;
  
@@ -915,7 +914,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              return value;
          }
  
-@@ -986,13 +1295,17 @@ class EmailRenderer {
+@@ -986,13 +1294,17 @@ class EmailRenderer {
          return null;
      }
  
@@ -935,7 +934,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
  
          const labs = this.getLabs();
          if (!labs?.isSet('emailCustomizationAlpha') && !labs?.isSet('emailCustomization')) {
-@@ -1002,9 +1315,13 @@ class EmailRenderer {
+@@ -1002,9 +1314,13 @@ class EmailRenderer {
          /** @type {'normal' | 'medium' | 'semibold' | 'bold' | string | null} */
          const settingValue = newsletter.get('title_font_weight');
  
@@ -950,7 +949,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #getTitleStrongWeight(titleWeight) {
          const numericWeight = parseInt(titleWeight, 10);
  
-@@ -1021,6 +1338,10 @@ class EmailRenderer {
+@@ -1021,6 +1337,10 @@ class EmailRenderer {
          }
      }
  
@@ -961,7 +960,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #getImageCorners(newsletter) {
          const value = newsletter.get('image_corners');
          if (value === 'rounded') {
-@@ -1029,6 +1350,10 @@ class EmailRenderer {
+@@ -1029,6 +1349,10 @@ class EmailRenderer {
          return false;
      }
  
@@ -972,7 +971,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
      #getDividerColor(newsletter) {
          const labs = this.getLabs();
  
-@@ -1038,7 +1363,7 @@ class EmailRenderer {
+@@ -1038,7 +1362,7 @@ class EmailRenderer {
  
              if (value === 'accent') {
                  return this.#settingsCache.get('accent_color');
@@ -981,7 +980,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
                  return value;
              }
          }
-@@ -1049,6 +1374,13 @@ class EmailRenderer {
+@@ -1049,6 +1373,13 @@ class EmailRenderer {
  
      /**
       * @private
@@ -995,7 +994,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
       */
      async getTemplateData({post, newsletter, html, addPaywall, segment}) {
          const labs = this.getLabs();
-@@ -1057,27 +1389,28 @@ class EmailRenderer {
+@@ -1057,27 +1388,28 @@ class EmailRenderer {
          let adjustedAccentColor;
          let adjustedAccentContrastColor;
          try {
@@ -1030,7 +1029,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          let buttonBorderRadius = '6px';
          if (hasAnyEmailCustomization) {
              if (newsletter.get('button_corners') === 'square') {
-@@ -1094,12 +1427,9 @@ class EmailRenderer {
+@@ -1094,12 +1426,9 @@ class EmailRenderer {
  
          const timezone = this.#settingsCache.get('timezone');
          const locale = this.#getValidLocale();
@@ -1045,7 +1044,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          let authors;
          const postAuthors = await post.getLazyRelation('authors');
          if (postAuthors?.models) {
-@@ -1135,6 +1465,7 @@ class EmailRenderer {
+@@ -1135,6 +1464,7 @@ class EmailRenderer {
  
          const hasEmailOnlyFlag = post.related('posts_meta')?.get('email_only') ?? false;
  
@@ -1053,7 +1052,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          const latestPosts = [];
          let latestPostsHasImages = false;
          if (newsletter.get('show_latest_posts')) {
-@@ -1184,6 +1515,7 @@ class EmailRenderer {
+@@ -1184,6 +1514,7 @@ class EmailRenderer {
  
          const linkStyle = (hasAnyEmailCustomization && newsletter.get('link_style')) || 'underline';
  
@@ -1061,7 +1060,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
          const data = {
              site: {
                  title: this.#settingsCache.get('title'),
-@@ -1278,7 +1610,11 @@ class EmailRenderer {
+@@ -1278,7 +1609,11 @@ class EmailRenderer {
      /**
       * @private
       * Sets and limits the width of an image + returns the width
@@ -1074,7 +1073,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
       */
      async limitImageWidth(href, visibleWidth = 600, visibleHeight = null) {
          if (!href) {
-@@ -1288,7 +1624,7 @@ class EmailRenderer {
+@@ -1288,7 +1623,7 @@ class EmailRenderer {
                  height: null
              };
          }
@@ -1083,7 +1082,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              // Unsplash images have a minimum size so assuming 1200px is safe
              const unsplashUrl = new URL(href);
              unsplashUrl.searchParams.delete('w');
-@@ -1341,7 +1677,7 @@ class EmailRenderer {
+@@ -1341,7 +1676,7 @@ class EmailRenderer {
                  };
              } catch (err) {
                  // log and proceed. Using original header image without fixed width isn't fatal.
@@ -1092,7 +1091,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..91b2547e408f4a512a9343ef6f849f2a
              }
          }
  
-@@ -1353,4 +1689,6 @@ class EmailRenderer {
+@@ -1353,4 +1688,6 @@ class EmailRenderer {
      }
  }
  

@@ -29,5 +29,6 @@ export const LITE_MODULES = {
     SettingsCache: true,
     UrlUtils: true,
     PostModel: true,
+    NewsletterModel: true,
   },
 } as const;
