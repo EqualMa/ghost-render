@@ -21,10 +21,22 @@ export default function makeRenderTemplate({
   registerHelpers(handlebarsRuntime, labs, t);
 
   // Partials
-  handlebarsRuntime.registerPartial("styles", cssPartialSource);
-  handlebarsRuntime.registerPartial("paywall", paywallPartial);
-  handlebarsRuntime.registerPartial("feedbackButton", feedbackButtonPartial);
-  handlebarsRuntime.registerPartial("latestPosts", latestPostsPartial);
+  handlebarsRuntime.registerPartial(
+    "styles",
+    handlebarsRuntime.template(cssPartialSource)
+  );
+  handlebarsRuntime.registerPartial(
+    "paywall",
+    handlebarsRuntime.template(paywallPartial)
+  );
+  handlebarsRuntime.registerPartial(
+    "feedbackButton",
+    handlebarsRuntime.template(feedbackButtonPartial)
+  );
+  handlebarsRuntime.registerPartial(
+    "latestPosts",
+    handlebarsRuntime.template(latestPostsPartial)
+  );
 
   // Actual template
   return handlebarsRuntime.template(htmlTemplateSource);
