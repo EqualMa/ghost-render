@@ -1,0 +1,27 @@
+diff --git a/dist/changesets-assemble-release-plan.cjs.js b/dist/changesets-assemble-release-plan.cjs.js
+index ae379dc5ba7ac6d40bd68c7029aca350bd92d88a..e3238f0c0f2e99c48833e95ceee8e2e2236562e4 100644
+--- a/dist/changesets-assemble-release-plan.cjs.js
++++ b/dist/changesets-assemble-release-plan.cjs.js
+@@ -307,6 +307,22 @@ function getDependencyVersionRanges(dependentPkgJSON, dependencyRelease) {
+   return dependencyVersionRanges;
+ }
+ function shouldBumpMajor({
++  ...options
++}) {
++  const should = shouldBumpMajor_original(options);
++
++  // breaking changes in 0.x versions should bump minor
++  if (
++    should &&
++    options.depType === "peerDependencies" && // This check is unnecessary but we only want this patch to fix https://github.com/changesets/changesets/issues/1228
++    options.releases.has(options.dependent) &&
++    options.releases.get(options.dependent).oldVersion.startsWith("0.")
++  )
++    return false;
++
++  return should;
++}
++function shouldBumpMajor_original({
+   dependent,
+   depType,
+   versionRange,
