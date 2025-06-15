@@ -1,6 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { dependencies } from "./package.json";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { tsImport } from "tsx/esm/api";
@@ -40,7 +40,19 @@ export default defineConfig({
         },
       ],
       hook: "buildStart",
-    }),
+    }).map(
+      (plugin): Plugin => ({
+        ...plugin,
+        buildStart: {
+          order: "pre",
+          handler: plugin.buildStart as Extract<
+            typeof plugin.buildStart,
+            Function
+          >,
+          sequential: true,
+        },
+      })
+    ),
     dts({
       bundleTypes: true,
       copyDtsFiles: true,
