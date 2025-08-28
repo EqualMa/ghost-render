@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "juice": "catalog:",
-    "cheerio": "catalog:"
+    "cheerio": "catalog:",
+    "clsx": "catalog:"
   },
   "scripts": {
     "build": "vite build"

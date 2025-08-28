@@ -16,7 +16,7 @@
     "ghost": "catalog:",
     "luxon": "^3.6.1",
     "handlebars": "^4.7.8",
-    "@tryghost/color-utils": "^0.2.6",
+    "@tryghost/color-utils": "catalog:",
     "@tryghost/html-to-plaintext": "^1.0.4",
     "@tryghost/kg-default-cards": "^10.1.3",
     "@tryghost/i18n": "*"

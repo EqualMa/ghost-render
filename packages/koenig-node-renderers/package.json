@@ -8,8 +8,9 @@
   },
   "dependencies": {
     "@tryghost/kg-markdown-html-renderer": "^7.1.2",
-    "clsx": "^2.1.1",
+    "clsx": "catalog:",
     "@tryghost/kg-clean-basic-html": "^4.2.5",
+    "@tryghost/color-utils": "catalog:",
     "luxon": "^3.6.1",
     "lodash": "^4.17.21"
   },

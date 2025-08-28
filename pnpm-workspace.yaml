@@ -1,17 +1,19 @@
 packages:
   - packages/*
 catalog:
-  ghost: 5.121.0
+  ghost: 6.0.5
   juice: ^11.0.0
   cheerio: ^1.0.0
+  clsx: ^2.1.1
+  "@tryghost/color-utils": "^0.2.10"
 configDependencies:
-  ghost: "5.121.0+sha512-4aaHZnx2yzn3HWgr3qeSqygwQrM2cJJMTcw660+ocrz3Kt353u/Vf0brg55FoqqjgrJh5NCyqHHJ4J27Fj0+gA=="
+  ghost: "6.0.5+sha512-68jiWSufTHqlqi8cQ27jcS5fAhppVhZhwM3KffI5zqu7ZG74HBkY5bksN+Ii067DX/ZaMYUaFtvsHse4jK41NA=="
 ignoredBuiltDependencies:
   - sqlite3
 onlyBuiltDependencies:
   - esbuild
 overrides:
-  "@tryghost/i18n": "file:./node_modules/.pnpm-config/ghost/components/tryghost-i18n-5.121.0.tgz"
+  "@tryghost/i18n": "file:./node_modules/.pnpm-config/ghost/components/tryghost-i18n-6.0.5.tgz"
   # override juice and cheerio
   # MAKE SURE API CHANGES ARE NOT BREAKING:
   # - https://github.com/Automattic/juice/releases

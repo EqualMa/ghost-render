@@ -1,6 +1,5 @@
 export { default as isUnsplashImage } from "./isUnsplashImage";
 export { default as textColorForBackgroundColor } from "./textColorForBackgroundColor";
-export { default as darkenToContrastThreshold } from "./darkenToContrastThreshold";
 export { default as logging } from "./logging";
 export { default as formatDateLong } from "./formatDateLong";
 export { default as formatPostPublishedAt } from "./formatPostPublishedAt";

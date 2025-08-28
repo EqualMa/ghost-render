@@ -38,6 +38,9 @@ export interface NewsletterObject {
   show_header_name: boolean;
   show_feature_image: boolean;
   footer_content?: string | undefined | null;
+  link_color: string | undefined | null;
+  button_color: string | undefined | null;
+  header_background_color: string | undefined | null;
 }
 
 export default class NewsletterModel extends makeFields<
@@ -74,4 +77,7 @@ export default class NewsletterModel extends makeFields<
   show_header_name: (v) => v.show_header_name,
   show_feature_image: (v) => v.show_feature_image,
   footer_content: (v) => v.footer_content,
+  link_color: (v) => v.link_color,
+  button_color: (v) => v.button_color,
+  header_background_color: (v) => v.header_background_color,
 }) {}

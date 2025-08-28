@@ -48,10 +48,10 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508ebd88158 100644
+index e841b73c070f0dd5ff7dd06d680029f9c5b1f24f..734d2dbdc218f5d4013b66c8be8c5dc9a77ec4b7 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
-@@ -1,20 +1,19 @@
+@@ -1,23 +1,23 @@
 +// @ts-check
 +
 +import { load as cheerioLoad } from 'cheerio';
@@ -67,6 +67,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 -const logging = require('@tryghost/logging');
 -const fs = require('fs').promises;
 -const path = require('path');
+ const clsx = require('clsx');
 -const {isUnsplashImage} = require('@tryghost/kg-default-cards/lib/utils');
 -const {textColorForBackgroundColor, darkenToContrastThreshold} = require('@tryghost/color-utils');
 -const {DateTime} = require('luxon');
@@ -74,15 +75,17 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 -const EmailAddressParser = require('../email-address/EmailAddressParser');
 -const {registerHelpers} = require('./helpers/register-helpers');
 -const crypto = require('crypto');
--
+ 
  const DEFAULT_LOCALE = 'en-gb';
+ const DEFAULT_ACCENT_COLOR = '#15212A';
+ const VALID_HEX_REGEX = /#([0-9a-f]{3}){1,2}$/i;
  
  // Wrapper function so that i18next-parser can find these strings
 +/** @type {<T>(x: T) => T} */
  const t = (x) => {
      return x;
  };
-@@ -31,6 +30,10 @@ const messages = {
+@@ -34,6 +34,10 @@ const messages = {
      }
  };
  
@@ -93,7 +96,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
  function escapeHtml(unsafe) {
      return unsafe
          .replace(/&/g, '&amp;')
-@@ -40,38 +43,89 @@ function escapeHtml(unsafe) {
+@@ -43,38 +47,92 @@ function escapeHtml(unsafe) {
          .replace(/'/g, '&#039;');
  }
  
@@ -204,10 +207,13 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 + * @prop {boolean} show_header_name
 + * @prop {boolean} show_feature_image
 + * @prop {string | undefined | null} footer_content
++ * @prop {string | undefined | null} link_color
++ * @prop {string | undefined | null} button_color
++ * @prop {string | undefined | null} header_background_color
   */
  
  /**
-@@ -106,6 +160,7 @@ function cheerioLoad(html) {
+@@ -109,6 +167,7 @@ function cheerioLoad(html) {
  /**
   * @typedef {object} EmailRenderOptions
   * @prop {boolean} clickTrackingEnabled
@@ -215,7 +221,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
   */
  
  /**
-@@ -115,7 +170,205 @@ function cheerioLoad(html) {
+@@ -118,7 +177,202 @@ function cheerioLoad(html) {
   * @prop {ReplacementDefinition[]} replacements
   */
  
@@ -224,7 +230,6 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 + * @prop {ImportsLogging} logging
 + * @prop {(href: string) => boolean} isUnsplashImage
 + * @prop {(backgroundColor: string) => ImportsReturnedColor} textColorForBackgroundColor
-+ * @prop {(accentColor: string, _arg1: '#ffffff', _arg2: 2) => ImportsReturnedColor} darkenToContrastThreshold
 + * @prop {(date: Date, timezone: string, locale: string) => string} formatDateLong
 + * @prop {(publishedAt: Date | null | undefined, timezone: string, locale: string) => string} formatPostPublishedAt
 + * @prop {(html: string) => string} htmlToPlaintext_email
@@ -403,8 +408,6 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +    #import_isUnsplashImage
 +    /** @type {Imports["textColorForBackgroundColor"]} */
 +    #import_textColorForBackgroundColor
-+    /** @type {Imports["darkenToContrastThreshold"]} */
-+    #import_darkenToContrastThreshold
 +    /** @type {Imports["formatDateLong"]} */
 +    #import_formatDateLong
 +    /** @type {Imports["formatPostPublishedAt"]} */
@@ -421,7 +424,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      #settingsCache;
      #settingsHelpers;
  
-@@ -126,7 +379,6 @@ class EmailRenderer {
+@@ -129,7 +383,6 @@ class EmailRenderer {
      #getPostUrl;
      #storageUtils;
  
@@ -429,7 +432,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      #renderTemplate;
      #linkReplacer;
      #linkTracking;
-@@ -140,26 +392,28 @@ class EmailRenderer {
+@@ -143,26 +396,28 @@ class EmailRenderer {
  
      /**
       * @param {object} dependencies
@@ -472,7 +475,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          settingsCache,
          settingsHelpers,
          renderers,
-@@ -175,8 +429,10 @@ class EmailRenderer {
+@@ -178,8 +433,10 @@ class EmailRenderer {
          outboundLinkTagger,
          labs,
          models,
@@ -484,7 +487,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          this.#settingsCache = settingsCache;
          this.#settingsHelpers = settingsHelpers;
          this.#renderers = renderers;
-@@ -193,14 +449,38 @@ class EmailRenderer {
+@@ -196,14 +453,37 @@ class EmailRenderer {
          this.#labs = labs;
          this.#models = models;
          this.#t = t;
@@ -492,7 +495,6 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +        this.#import_logging = imports.logging;
 +        this.#import_isUnsplashImage = imports.isUnsplashImage;
 +        this.#import_textColorForBackgroundColor = imports.textColorForBackgroundColor;
-+        this.#import_darkenToContrastThreshold = imports.darkenToContrastThreshold;
 +        this.#import_formatDateLong = imports.formatDateLong;
 +        this.#import_formatPostPublishedAt = imports.formatPostPublishedAt;
 +        this.#import_htmlToPlaintext_email = imports.htmlToPlaintext_email;
@@ -523,7 +525,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          let senderName = this.#settingsCache.get('title') ? this.#settingsCache.get('title').replace(/"/g, '\\"') : '';
          if (newsletter.get('sender_name')) {
              senderName = newsletter.get('sender_name');
-@@ -215,7 +495,7 @@ class EmailRenderer {
+@@ -218,7 +498,7 @@ class EmailRenderer {
          if (process.env.NODE_ENV !== 'production') {
              if (/@localhost$/.test(fromAddress) || /@ghost.local$/.test(fromAddress)) {
                  const localAddress = 'localhost@example.com';
@@ -532,7 +534,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  fromAddress = localAddress;
              }
          }
-@@ -237,20 +517,25 @@ class EmailRenderer {
+@@ -240,20 +520,25 @@ class EmailRenderer {
          locale = locale.trim();
  
          // If the locale is just "en", or is not valid, revert to default
@@ -560,7 +562,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      }
  
      /**
-@@ -275,7 +560,7 @@ class EmailRenderer {
+@@ -278,7 +563,7 @@ class EmailRenderer {
          });
  
          if (addresses.replyTo) {
@@ -569,7 +571,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          }
          return null;
      }
-@@ -314,9 +599,16 @@ class EmailRenderer {
+@@ -317,9 +602,16 @@ class EmailRenderer {
          return allowedSegments;
      }
  
@@ -586,7 +588,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          const renderOptions = {
              target: 'email',
              postUrl
-@@ -360,12 +652,17 @@ class EmailRenderer {
+@@ -355,12 +647,17 @@ class EmailRenderer {
          if (post.get('lexical')) {
              // only lexical's renderer is async
              html = await this.#renderers.lexical.render(
@@ -606,7 +608,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              );
          }
          return html;
-@@ -421,6 +718,9 @@ class EmailRenderer {
+@@ -416,6 +713,9 @@ class EmailRenderer {
          html = $.html();
  
          const templateData = await this.getTemplateData({
@@ -616,7 +618,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              post,
              newsletter,
              html,
-@@ -507,11 +807,10 @@ class EmailRenderer {
+@@ -502,11 +802,10 @@ class EmailRenderer {
          });
  
          // Add a class to each figcaption so we can style them in the email
@@ -629,7 +631,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          html = juice(html, {inlinePseudoElements: true, removeStyleTags: true});
  
          // happens after inlining of CSS so we can change element types without worrying about styling
-@@ -536,15 +835,15 @@ class EmailRenderer {
+@@ -531,15 +830,15 @@ class EmailRenderer {
          $('a').attr('target', '_blank');
  
          // convert figure and figcaption to div so that Outlook applies margins
@@ -648,7 +650,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  $(elem).remove();
              });
          }
-@@ -558,7 +857,7 @@ class EmailRenderer {
+@@ -553,7 +852,7 @@ class EmailRenderer {
          // TODO: normalizeReplacementStrings (replace unsupported replacement strings)
  
          // Convert HTML to plaintext
@@ -657,7 +659,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
  
          // Fix any unsupported chars in Outlook
          html = html.replace(/&apos;/g, '&#39;');
-@@ -580,12 +879,11 @@ class EmailRenderer {
+@@ -575,12 +874,11 @@ class EmailRenderer {
       * Takes a member and newsletter uuid. Returns the url that should be used to unsubscribe
       * In case of no member uuid, generates the preview unsubscribe url - `?preview=1`
       *
@@ -674,7 +676,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          return this.#settingsHelpers.createUnsubscribeUrl(uuid, options);
      }
  
-@@ -595,6 +893,7 @@ class EmailRenderer {
+@@ -590,6 +888,7 @@ class EmailRenderer {
       * @param {string} [uuid] member uuid
       */
      createManageAccountUrl(uuid) {
@@ -682,7 +684,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          const siteUrl = this.#urlUtils.urlFor('home', true);
          const url = new URL(siteUrl);
          url.hash = '#/portal/account';
-@@ -604,6 +903,8 @@ class EmailRenderer {
+@@ -599,6 +898,8 @@ class EmailRenderer {
  
      /**
       * Returns whether a paid member is trialing a subscription
@@ -691,7 +693,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
       */
      isMemberTrialing(member) {
          // Do we have an active subscription?
-@@ -666,11 +967,11 @@ class EmailRenderer {
+@@ -661,11 +962,11 @@ class EmailRenderer {
              const timezone = this.#settingsCache.get('timezone');
              // Translate to a human readable string
              if (activeSubscription.trial_end_at && activeSubscription.trial_end_at > new Date() && activeSubscription.status === 'trialing') {
@@ -705,7 +707,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              if (activeSubscription.cancel_at_period_end) {
                  return t(messages.subscriptionStatus.canceled, {date});
              }
-@@ -681,7 +982,7 @@ class EmailRenderer {
+@@ -676,7 +977,7 @@ class EmailRenderer {
  
          if (expires) {
              const timezone = this.#settingsCache.get('timezone');
@@ -714,7 +716,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              return t(messages.subscriptionStatus.complimentaryExpires, {date});
          }
  
-@@ -690,17 +991,21 @@ class EmailRenderer {
+@@ -685,17 +986,21 @@ class EmailRenderer {
  
      /**
       * Note that we only look in HTML because plaintext and HTML are essentially the same content
@@ -737,7 +739,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  }
              },
              {
-@@ -718,7 +1023,10 @@ class EmailRenderer {
+@@ -713,7 +1018,10 @@ class EmailRenderer {
              {
                  id: 'key',
                  getValue: (member) => {
@@ -749,7 +751,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  }
              },
              {
-@@ -749,7 +1057,7 @@ class EmailRenderer {
+@@ -744,7 +1052,7 @@ class EmailRenderer {
                  id: 'created_at',
                  getValue: (member) => {
                      const timezone = this.#settingsCache.get('timezone');
@@ -758,7 +760,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  }
              },
              {
-@@ -776,7 +1084,7 @@ class EmailRenderer {
+@@ -771,7 +1079,7 @@ class EmailRenderer {
              {
                  id: 'list_unsubscribe',
                  getValue: (member) => {
@@ -767,7 +769,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  },
                  required: true // Used in email headers
              }
-@@ -787,8 +1095,10 @@ class EmailRenderer {
+@@ -782,8 +1090,10 @@ class EmailRenderer {
          const REPLACEMENT_STRING_REGEX = /^(?<recipientProperty>\w+?)(?:,? *(?:"|&quot;)(?<fallback>.*?)(?:"|&quot;))?$/;
  
          // Stores the definitions that we are actually going to use
@@ -778,7 +780,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          let result;
          while ((result = EMAIL_REPLACEMENT_REGEX.exec(html)) !== null) {
              const [replacementMatch, replacementStr] = result;
-@@ -800,7 +1110,7 @@ class EmailRenderer {
+@@ -795,7 +1105,7 @@ class EmailRenderer {
              const match = replacementStr.match(REPLACEMENT_STRING_REGEX);
  
              if (match) {
@@ -787,7 +789,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  const definition = baseDefinitions.find(d => d.id === recipientProperty);
  
                  if (definition) {
-@@ -842,37 +1152,20 @@ class EmailRenderer {
+@@ -837,38 +1147,20 @@ class EmailRenderer {
          return this.#labs;
      }
  
@@ -812,7 +814,8 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 -        this.#handlebars.registerPartial('latestPosts', latestPostsPartial);
 -
 -        // Actual template
--        const htmlTemplateSource = await fs.readFile(path.join(__dirname, './email-templates/', `template.hbs`), 'utf8');
+-        let templateName = 'template.hbs';
+-        const htmlTemplateSource = await fs.readFile(path.join(__dirname, './email-templates/', templateName), 'utf8');
 -        this.#renderTemplate = this.#handlebars.compile(Buffer.from(htmlTemplateSource).toString());
 -
 +    /**
@@ -834,7 +837,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
       */
      #getEmailPreheader(postModel, segment, html) {
          let plaintext = postModel.get('plaintext');
-@@ -885,7 +1178,7 @@ class EmailRenderer {
+@@ -881,7 +1173,7 @@ class EmailRenderer {
                  // so we use the provided HTML to generate the plaintext as this
                  // should have already had the paid content removed
                  if (segment === 'status:free') {
@@ -843,7 +846,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
                  }
                  return plaintext.substring(0, 500);
              } else {
-@@ -894,6 +1187,11 @@ class EmailRenderer {
+@@ -890,6 +1182,11 @@ class EmailRenderer {
          }
      }
  
@@ -855,7 +858,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      truncateText(text, maxLength) {
          if (text && text.length > maxLength) {
              return text.substring(0, maxLength - 1).trim() + '…';
-@@ -904,10 +1202,10 @@ class EmailRenderer {
+@@ -900,10 +1197,10 @@ class EmailRenderer {
  
      /**
       *
@@ -868,49 +871,51 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
       */
      truncateHtml(text, maxLength, maxLengthMobile) {
          if (!maxLengthMobile || maxLength <= maxLengthMobile) {
-@@ -928,13 +1226,17 @@ class EmailRenderer {
-         }
+@@ -936,14 +1233,18 @@ class EmailRenderer {
+ 
+     #getAccentContrastColor() {
+         const accentColor = this.#getAccentColor();
+-        return textColorForBackgroundColor(accentColor).hex();
++        return this.#import_textColorForBackgroundColor(accentColor).hex();
      }
  
 +    /**
-+     * @param {Newsletter} newsletter
++     * @param {Newsletter|undefined} newsletter
 +     * @returns {string}
 +     */
      #getBackgroundColor(newsletter) {
-         /** @type {'light' | 'dark' | string | null} */
-         const value = newsletter.get('background_color');
+-        /** @type {'light' | string | null} */
++        /** @type {'light' | string | null | undefined} */
+         const value = newsletter?.get('background_color');
  
-         const validHex = /#([0-9a-f]{3}){1,2}$/i;
- 
--        if (validHex.test(value)) {
-+        if (value && validHex.test(value)) {
+-        if (VALID_HEX_REGEX.test(value)) {
++        if (value && VALID_HEX_REGEX.test(value)) {
              return value;
          }
  
-@@ -946,13 +1248,18 @@ class EmailRenderer {
+@@ -951,11 +1252,16 @@ class EmailRenderer {
          return '#ffffff';
      }
  
 +    /**
-+     * @param {Newsletter} newsletter
++     * @param {Newsletter|undefined} newsletter
 +     * @param {string} accentColor
 +     * @returns {string}
 +     */
      #getPostTitleColor(newsletter, accentColor) {
-         /** @type {'accent' | 'auto' | string | null} */
-         const value = newsletter.get('post_title_color');
+-        /** @type {'accent' | string | null} */
++        /** @type {'accent' | string | null | undefined} */
+         const value = newsletter?.get('post_title_color');
  
-         const validHex = /#([0-9a-f]{3}){1,2}$/i;
- 
--        if (validHex.test(value)) {
-+        if (value && validHex.test(value)) {
+-        if (VALID_HEX_REGEX.test(value)) {
++        if (value && VALID_HEX_REGEX.test(value)) {
              return value;
          }
  
-@@ -962,9 +1269,14 @@ class EmailRenderer {
+@@ -965,14 +1271,19 @@ class EmailRenderer {
  
-         // value === 'auto', value === null, value is not valid hex
-         const backgroundColor = this.#getBackgroundColor(newsletter);
+         // value === null, value is not valid hex
+         const backgroundColor = this.#getHeaderBackgroundColor(newsletter, accentColor) || this.#getBackgroundColor(newsletter);
 -        return textColorForBackgroundColor(backgroundColor).hex();
 +        return this.#import_textColorForBackgroundColor(backgroundColor).hex();
      }
@@ -921,18 +926,15 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +     * @returns {string | null}
 +     */
      #getSectionTitleColor(newsletter, accentColor) {
-         const labs = this.getLabs();
-         if (!labs?.isSet('emailCustomization') && !labs?.isSet('emailCustomizationAlpha')) {
-@@ -975,7 +1287,7 @@ class EmailRenderer {
+         /** @type {'accent' | string | null} */
          const value = newsletter.get('section_title_color');
-         const validHex = /#([0-9a-f]{3}){1,2}$/i;
  
--        if (validHex.test(value)) {
-+        if (value && validHex.test(value)) {
+-        if (VALID_HEX_REGEX.test(value)) {
++        if (value && VALID_HEX_REGEX.test(value)) {
              return value;
          }
  
-@@ -986,13 +1298,17 @@ class EmailRenderer {
+@@ -983,20 +1294,28 @@ class EmailRenderer {
          return null;
      }
  
@@ -950,9 +952,6 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 -        };
 +        });
  
-         const labs = this.getLabs();
-         if (!labs?.isSet('emailCustomizationAlpha') && !labs?.isSet('emailCustomization')) {
-@@ -1002,9 +1318,13 @@ class EmailRenderer {
          /** @type {'normal' | 'medium' | 'semibold' | 'bold' | string | null} */
          const settingValue = newsletter.get('title_font_weight');
  
@@ -967,7 +966,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      #getTitleStrongWeight(titleWeight) {
          const numericWeight = parseInt(titleWeight, 10);
  
-@@ -1021,6 +1341,10 @@ class EmailRenderer {
+@@ -1013,6 +1332,10 @@ class EmailRenderer {
          }
      }
  
@@ -978,7 +977,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
      #getImageCorners(newsletter) {
          const value = newsletter.get('image_corners');
          if (value === 'rounded') {
-@@ -1029,6 +1353,10 @@ class EmailRenderer {
+@@ -1021,12 +1344,16 @@ class EmailRenderer {
          return false;
      }
  
@@ -987,18 +986,109 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +     * @returns {string}
 +     */
      #getDividerColor(newsletter) {
-         const labs = this.getLabs();
+         const value = newsletter?.get('divider_color');
  
-@@ -1038,7 +1366,7 @@ class EmailRenderer {
- 
-             if (value === 'accent') {
-                 return this.#settingsCache.get('accent_color');
--            } else if (validHex.test(value)) {
-+            } else if (value && validHex.test(value)) {
-                 return value;
-             }
+         if (value === 'accent') {
+             return this.#getAccentColor();
+-        } else if (VALID_HEX_REGEX.test(value)) {
++        } else if (value && VALID_HEX_REGEX.test(value)) {
+             return value;
+         } else {
+             // value === 'light'/missing/invalid
+@@ -1034,6 +1361,11 @@ class EmailRenderer {
          }
-@@ -1049,35 +1377,51 @@ class EmailRenderer {
+     }
+ 
++    /**
++     * @param {Newsletter} newsletter 
++     * @param {string} accentColor 
++     * @returns 
++     */
+     #getLinkColor(newsletter, accentColor) {
+         const value = newsletter.get('link_color');
+ 
+@@ -1042,27 +1374,32 @@ class EmailRenderer {
+         }
+ 
+         if (value === null) {
+-            return textColorForBackgroundColor(this.#getBackgroundColor(newsletter)).hex();
++            return this.#import_textColorForBackgroundColor(this.#getBackgroundColor(newsletter)).hex();
+         }
+ 
+-        if (VALID_HEX_REGEX.test(value)) {
++        if (value && VALID_HEX_REGEX.test(value)) {
+             return value;
+         }
+ 
+         return accentColor; // default to accent color
+     }
+ 
++    /**
++     * @param {Newsletter|undefined} newsletter 
++     * @param {string} accentColor 
++     * @returns {string}
++     */
+     #getButtonColor(newsletter, accentColor) {
+-        /** @type {'accent' | string | null} */
++        /** @type {'accent' | string | null | undefined} */
+         const buttonColor = newsletter?.get('button_color');
+ 
+         if (buttonColor === 'accent') {
+             return accentColor;
+         }
+ 
+-        if (buttonColor === null) {
++        if (buttonColor == null) {
+             const backgroundColor = this.#getBackgroundColor(newsletter);
+-            return textColorForBackgroundColor(backgroundColor).hex();
++            return this.#import_textColorForBackgroundColor(backgroundColor).hex();
+         }
+ 
+         if (VALID_HEX_REGEX.test(buttonColor)) {
+@@ -1074,16 +1411,31 @@ class EmailRenderer {
+ 
+     // white/black for dark/light button colors
+     // outline buttons use button color as text color but that's handled in styles
++    /**
++     * @param {Newsletter|undefined} newsletter 
++     * @param {string} accentColor 
++     * @returns {string}
++     */
+     #getButtonTextColor(newsletter, accentColor) {
+         const buttonColor = this.#getButtonColor(newsletter, accentColor);
+-        return textColorForBackgroundColor(buttonColor).hex();
++        return this.#import_textColorForBackgroundColor(buttonColor).hex();
+     }
+ 
++    /**
++     * @param {Newsletter|undefined} newsletter 
++     * @returns {boolean}
++     */
+     #checkIfBackgroundIsDark(newsletter) {
+         const backgroundColor = this.#getBackgroundColor(newsletter);
+-        return textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
++        return this.#import_textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
+     }
+ 
++    /**
++     * 
++     * @param {Newsletter|undefined} newsletter 
++     * @param {string} accentColor 
++     * @returns {string|null}
++     */
+     #getHeaderBackgroundColor(newsletter, accentColor) {
+         const value = newsletter?.get('header_background_color');
+ 
+@@ -1095,7 +1447,7 @@ class EmailRenderer {
+             return accentColor;
+         }
+ 
+-        if (VALID_HEX_REGEX.test(value)) {
++        if (value && VALID_HEX_REGEX.test(value)) {
+             return value;
+         }
+ 
+@@ -1104,8 +1456,23 @@ class EmailRenderer {
  
      /**
       * @private
@@ -1020,44 +1110,30 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +        addPaywall,
 +        segment,
 +    }) {
-         const labs = this.getLabs();
+         const accentColor = this.#getAccentColor();
+         const accentContrastColor = this.#getAccentContrastColor();
  
-         let accentColor = this.#settingsCache.get('accent_color') || '#15212A';
-         let adjustedAccentColor;
-         let adjustedAccentContrastColor;
-         try {
--            adjustedAccentColor = accentColor && darkenToContrastThreshold(accentColor, '#ffffff', 2).hex();
--            adjustedAccentContrastColor = accentColor && textColorForBackgroundColor(adjustedAccentColor).hex();
-+            adjustedAccentColor = accentColor && this.#import_darkenToContrastThreshold(accentColor, '#ffffff', 2).hex();
-+            adjustedAccentContrastColor = accentColor && this.#import_textColorForBackgroundColor(adjustedAccentColor).hex();
-         } catch (e) {
--            logging.error(e);
-+            this.#import_logging.error(e);
-             accentColor = '#15212A';
-         }
- 
-         const hasAnyEmailCustomization = labs.isSet('emailCustomization') || labs.isSet('emailCustomizationAlpha');
- 
-         const backgroundColor = this.#getBackgroundColor(newsletter);
--        const backgroundIsDark = textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
-+        const backgroundIsDark = this.#import_textColorForBackgroundColor(backgroundColor).hex().toLowerCase() === '#ffffff';
+@@ -1115,7 +1482,7 @@ class EmailRenderer {
          const postTitleColor = this.#getPostTitleColor(newsletter, accentColor);
          const titleWeight = this.#getTitleWeight(newsletter);
          const titleStrongWeight = this.#getTitleStrongWeight(titleWeight);
--        const textColor = textColorForBackgroundColor(backgroundColor).hex();
--        const secondaryTextColor = textColorForBackgroundColor(backgroundColor).alpha(0.5).toString();
-+        const textColor = this.#import_textColorForBackgroundColor(backgroundColor).hex();
-+        const secondaryTextColor = this.#import_textColorForBackgroundColor(backgroundColor).alpha(0.5).toString();
-         const linkColor = backgroundIsDark ? '#ffffff' : accentColor;
-         const hasRoundedImageCorners = hasAnyEmailCustomization ? this.#getImageCorners(newsletter) : false;
-         const sectionTitleColor = hasAnyEmailCustomization ? this.#getSectionTitleColor(newsletter, accentColor) : null;
-         const dividerColor = this.#getDividerColor(newsletter);
+-        const textColor = textColorForBackgroundColor(backgroundColor).hex(); // this is used by the header background color so keeping it separate from the content text color
++        const textColor = this.#import_textColorForBackgroundColor(backgroundColor).hex(); // this is used by the header background color so keeping it separate from the content text color
+         const linkColor = this.#getLinkColor(newsletter, accentColor);
+         const hasRoundedImageCorners = this.#getImageCorners(newsletter);
+         const sectionTitleColor = this.#getSectionTitleColor(newsletter, accentColor);
+@@ -1123,8 +1490,9 @@ class EmailRenderer {
+         const buttonColor = this.#getButtonColor(newsletter, accentColor);
+         const buttonTextColor = this.#getButtonTextColor(newsletter, accentColor);
+         const headerBackgroundColor = this.#getHeaderBackgroundColor(newsletter, accentColor);
+-        const headerBackgroundIsDark = textColorForBackgroundColor(headerBackgroundColor || backgroundColor).hex().toLowerCase() === '#ffffff';
++        const headerBackgroundIsDark = this.#import_textColorForBackgroundColor(headerBackgroundColor || backgroundColor).hex().toLowerCase() === '#ffffff';
  
 +        /** @type {ButtonBorderRadius} */
          let buttonBorderRadius = '6px';
-         if (hasAnyEmailCustomization) {
-             if (newsletter.get('button_corners') === 'square') {
-@@ -1094,12 +1438,9 @@ class EmailRenderer {
+         if (newsletter.get('button_corners') === 'square') {
+             buttonBorderRadius = '0';
+@@ -1139,12 +1507,9 @@ class EmailRenderer {
  
          const timezone = this.#settingsCache.get('timezone');
          const locale = this.#getValidLocale();
@@ -1072,7 +1148,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          let authors;
          const postAuthors = await post.getLazyRelation('authors');
          if (postAuthors?.models) {
-@@ -1135,6 +1476,7 @@ class EmailRenderer {
+@@ -1180,6 +1545,7 @@ class EmailRenderer {
  
          const hasEmailOnlyFlag = post.related('posts_meta')?.get('email_only') ?? false;
  
@@ -1080,9 +1156,9 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
          const latestPosts = [];
          let latestPostsHasImages = false;
          if (newsletter.get('show_latest_posts')) {
-@@ -1184,7 +1526,9 @@ class EmailRenderer {
+@@ -1224,7 +1590,9 @@ class EmailRenderer {
  
-         const linkStyle = (hasAnyEmailCustomization && newsletter.get('link_style')) || 'underline';
+         const linkStyle = newsletter.get('link_style') || 'underline';
  
 +        /** @type {TemplateData} */
          const data = {
@@ -1090,7 +1166,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              site: {
                  title: this.#settingsCache.get('title'),
                  url: this.#urlUtils.urlFor('home', true),
-@@ -1278,7 +1622,11 @@ class EmailRenderer {
+@@ -1362,7 +1730,11 @@ class EmailRenderer {
      /**
       * @private
       * Sets and limits the width of an image + returns the width
@@ -1103,7 +1179,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
       */
      async limitImageWidth(href, visibleWidth = 600, visibleHeight = null) {
          if (!href) {
-@@ -1288,7 +1636,7 @@ class EmailRenderer {
+@@ -1372,7 +1744,7 @@ class EmailRenderer {
                  height: null
              };
          }
@@ -1112,7 +1188,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              // Unsplash images have a minimum size so assuming 1200px is safe
              const unsplashUrl = new URL(href);
              unsplashUrl.searchParams.delete('w');
-@@ -1341,7 +1689,7 @@ class EmailRenderer {
+@@ -1425,7 +1797,7 @@ class EmailRenderer {
                  };
              } catch (err) {
                  // log and proceed. Using original header image without fixed width isn't fatal.
@@ -1121,7 +1197,7 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
              }
          }
  
-@@ -1353,4 +1701,6 @@ class EmailRenderer {
+@@ -1437,4 +1809,6 @@ class EmailRenderer {
      }
  }
  
@@ -1131,10 +1207,10 @@ index ffbd3f8e8bef5f351a34a787f6b551d62934fbe1..d6e6a305ddbbe1db5d2c46e041ff8508
 +/** @typedef {ConstructorParameters<typeof EmailRenderer>[0]} Dependencies */
 diff --git a/core/server/services/email-service/EmailRendererTypes.d.ts b/core/server/services/email-service/EmailRendererTypes.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9cf5127993
+index 0000000000000000000000000000000000000000..2258e087fc679d2206b9118901dfd5b31ce56e94
 --- /dev/null
 +++ b/core/server/services/email-service/EmailRendererTypes.d.ts
-@@ -0,0 +1,102 @@
+@@ -0,0 +1,109 @@
 +export interface TemplateData {
 +  site: {
 +    title: string;
@@ -1164,13 +1240,15 @@ index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9c
 +    showCommentCta: boolean;
 +    showSubscriptionDetails: boolean;
 +  };
++
++  hasHeaderContent: boolean;
++
 +  latestPosts: LatestPost[];
 +  latestPostsHasImages: boolean;
 +
 +  //CSS
 +  accentColor: string;
-+  adjustedAccentColor: string;
-+  adjustedAccentContrastColor: string;
++  accentContrastColor: string;
 +  showBadge: boolean;
 +  backgroundColor: string;
 +  backgroundIsDark: boolean;
@@ -1178,7 +1256,6 @@ index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9c
 +  titleWeight: TitleWeight;
 +  titleStrongWeight: TitleStrongWeight;
 +  textColor: string;
-+  secondaryTextColor: string;
 +  linkColor: string;
 +  hasRoundedImageCorners: boolean;
 +  buttonBorderRadius: ButtonBorderRadius;
@@ -1187,6 +1264,10 @@ index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9c
 +  headerImageWidth: number;
 +  showHeaderIcon: false | string;
 +  dividerColor: string;
++  buttonColor: string;
++  buttonTextColor: string;
++  headerBackgroundColor: string | null;
++  headerBackgroundIsDark: boolean;
 +
 +  showHeaderTitle: boolean;
 +  showHeaderName: boolean;
@@ -1194,6 +1275,8 @@ index 0000000000000000000000000000000000000000..f90057952aeaf8880a42a94bbbd4bd9c
 +  footerContent: string | undefined | null;
 +  linkStyle: string;
 +  hasOutlineButtons: boolean;
++
++  ctaBgColors: string[],
 +
 +  classes: {
 +    container: string;
@@ -1251,10 +1334,10 @@ index 52f1bd82772947374967a905794c9f054a65630d..ed30782ac38e2240c69731cac0defc9f
  const errors = require('@tryghost/errors');
  const tpl = require('@tryghost/tpl');
 diff --git a/core/server/services/email-service/email-templates/template.hbs b/core/server/services/email-service/email-templates/template.hbs
-index 2a6e6b68023ca56c5faa0b3092542a2437d6cc50..3569ad0b55b15c8e96ba3cd247fbf283253e68f5 100644
+index d45f7ff2e964b46e6b688ae6f02bfcd06e50995d..356dbf202c60ca461b090a90b3b011bd42fb8720 100644
 --- a/core/server/services/email-service/email-templates/template.hbs
 +++ b/core/server/services/email-service/email-templates/template.hbs
-@@ -208,7 +208,12 @@
+@@ -249,7 +249,12 @@
                                              <tr><td class="footer">{{{footerContent}}}</td></tr>
                                          {{/if}}
                                          <tr>
@@ -1328,4 +1411,4 @@ index 0000000000000000000000000000000000000000..ad68b41e4317da7a5d1dcfb6053f4ef3
 +export { DEFAULT_NODES } from "@tryghost/kg-default-nodes";
 diff --git a/yarn.lock b/yarn.lock
 deleted file mode 100644
-index 0af3fa5d70b6165e95412f0ea2ba6427023c3626..0000000000000000000000000000000000000000
+index a31642a549a540de7da1da2c844ad20ee085a7b0..0000000000000000000000000000000000000000

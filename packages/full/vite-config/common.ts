@@ -50,7 +50,6 @@ export const MODULES = {
       createKeyForMember: true,
       formatPostPublishedAt: true,
       isValidLocale: true,
-      darkenToContrastThreshold: true,
       htmlToPlaintext_email: true,
       logging: true,
       EmailAddressParser_stringify: true,
