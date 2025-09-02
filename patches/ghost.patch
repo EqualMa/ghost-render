@@ -48,7 +48,7 @@ index 36f7b2e8085f16b35f999fc898baf51ac1791d1f..40f9dfa752e962376c226cb5d60b771a
  
      get sendingDomain(): string | null {
 diff --git a/core/server/services/email-service/EmailRenderer.js b/core/server/services/email-service/EmailRenderer.js
-index e841b73c070f0dd5ff7dd06d680029f9c5b1f24f..734d2dbdc218f5d4013b66c8be8c5dc9a77ec4b7 100644
+index e841b73c070f0dd5ff7dd06d680029f9c5b1f24f..f161bbbc08f964d3721cb0c1c21b8318b155649a 100644
 --- a/core/server/services/email-service/EmailRenderer.js
 +++ b/core/server/services/email-service/EmailRenderer.js
 @@ -1,23 +1,23 @@
@@ -67,7 +67,7 @@ index e841b73c070f0dd5ff7dd06d680029f9c5b1f24f..734d2dbdc218f5d4013b66c8be8c5dc9
 -const logging = require('@tryghost/logging');
 -const fs = require('fs').promises;
 -const path = require('path');
- const clsx = require('clsx');
+-const clsx = require('clsx');
 -const {isUnsplashImage} = require('@tryghost/kg-default-cards/lib/utils');
 -const {textColorForBackgroundColor, darkenToContrastThreshold} = require('@tryghost/color-utils');
 -const {DateTime} = require('luxon');
@@ -75,6 +75,7 @@ index e841b73c070f0dd5ff7dd06d680029f9c5b1f24f..734d2dbdc218f5d4013b66c8be8c5dc9
 -const EmailAddressParser = require('../email-address/EmailAddressParser');
 -const {registerHelpers} = require('./helpers/register-helpers');
 -const crypto = require('crypto');
++import clsx from 'clsx';
  
  const DEFAULT_LOCALE = 'en-gb';
  const DEFAULT_ACCENT_COLOR = '#15212A';
