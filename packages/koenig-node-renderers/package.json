@@ -1,6 +1,6 @@
 {
   "name": "@ghost-render/koenig-node-renderers",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "publishConfig": {
     "directory": "dist",

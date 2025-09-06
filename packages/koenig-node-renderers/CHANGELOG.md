@@ -1,5 +1,11 @@
 # @ghost-render/koenig-node-renderers
 
+## 0.0.4
+
+### Patch Changes
+
+- 553ccfa: fix: @tryghost/color-utils has esm
+
 ## 0.0.3
 
 ### Patch Changes
