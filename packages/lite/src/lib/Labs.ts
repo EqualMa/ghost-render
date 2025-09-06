@@ -8,8 +8,6 @@ export type LabsObject = { [_ in DependenciesLabsKnownKey]?: boolean };
 const DEFAULTS: Record<string, boolean | undefined> = {
   i18n: true,
   contentVisibility: true,
-  emailCustomization: false,
-  emailCustomizationAlpha: false,
 } satisfies Record<DependenciesLabsKnownKey, boolean>;
 
 export default class Labs implements DependenciesLabs {
