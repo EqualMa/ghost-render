@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ghost-render/email-renderer": "workspace:",
+    "@ghost-render/koenig-node-renderers": "workspace:",
     "handlebars": "catalog:ghost-dep",
     "@tryghost/color-utils": "catalog:ghost-dep",
     "@tryghost/html-to-plaintext": "catalog:ghost-dep",
@@ -19,14 +20,6 @@
     "@tryghost/kg-default-cards": "catalog:ghost-dep",
     "html5parser": "catalog:ghost-dep",
     "entities": "catalog:ghost-dep"
-  },
-  "peerDependencies": {
-    "@ghost-render/koenig-node-renderers": "workspace:"
-  },
-  "peerDependenciesMeta": {
-    "@ghost-render/koenig-node-renderers": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "ghost": "catalog:",
