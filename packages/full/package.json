@@ -14,11 +14,11 @@
   },
   "peerDependencies": {
     "ghost": "catalog:",
-    "luxon": "^3.6.1",
+    "luxon": "^3.7.1",
     "handlebars": "^4.7.8",
     "@tryghost/color-utils": "catalog:",
     "@tryghost/html-to-plaintext": "^1.0.4",
-    "@tryghost/kg-default-cards": "^10.1.3",
+    "@tryghost/kg-default-cards": "^10.1.5",
     "@tryghost/i18n": "*"
   },
   "peerDependenciesMeta": {

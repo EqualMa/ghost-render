@@ -238,17 +238,17 @@ importers:
   packages/email-renderer-mobiledoc:
     dependencies:
       '@tryghost/kg-card-factory':
+        specifier: ^5.1.2
+        version: 5.1.2
+      '@tryghost/kg-default-atoms':
         specifier: ^5.1.1
         version: 5.1.1
-      '@tryghost/kg-default-atoms':
-        specifier: ^5.1.0
-        version: 5.1.0
       '@tryghost/kg-default-cards':
-        specifier: ^10.1.3
-        version: 10.1.3
+        specifier: ^10.1.5
+        version: 10.1.5
       '@tryghost/kg-mobiledoc-html-renderer':
-        specifier: ^7.1.2
-        version: 7.1.2
+        specifier: ^7.1.3
+        version: 7.1.3
     devDependencies:
       '@ghost-render/email-renderer':
         specifier: 'workspace:'
@@ -273,8 +273,8 @@ importers:
         specifier: file:../../node_modules/.pnpm-config/ghost/components/tryghost-i18n-6.0.5.tgz
         version: file:node_modules/.pnpm-config/ghost/components/tryghost-i18n-6.0.5.tgz
       '@tryghost/kg-default-cards':
-        specifier: ^10.1.3
-        version: 10.1.3
+        specifier: ^10.1.5
+        version: 10.1.5
       ghost:
         specifier: 'catalog:'
         version: 6.0.5(patch_hash=0bb5849ef313d66e104ab7f064eea694c0cf5a98a5c8f836e30ba82506a4432c)(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lodash@4.17.21)
@@ -282,8 +282,8 @@ importers:
         specifier: ^4.7.8
         version: 4.7.8
       luxon:
-        specifier: ^3.6.1
-        version: 3.6.1
+        specifier: ^3.7.1
+        version: 3.7.2
     devDependencies:
       '@types/node':
         specifier: '*'
@@ -296,11 +296,11 @@ importers:
         specifier: 'catalog:'
         version: 0.2.10
       '@tryghost/kg-clean-basic-html':
-        specifier: ^4.2.5
-        version: 4.2.5
+        specifier: ^4.2.7
+        version: 4.2.7
       '@tryghost/kg-markdown-html-renderer':
-        specifier: ^7.1.2
-        version: 7.1.2
+        specifier: ^7.1.3
+        version: 7.1.3
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -308,8 +308,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       luxon:
-        specifier: ^3.6.1
-        version: 3.6.1
+        specifier: ^3.7.1
+        version: 3.7.2
     devDependencies:
       '@ghost-render/email-renderer':
         specifier: 'workspace:'
@@ -334,14 +334,14 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4(patch_hash=5e35955fcf8ad342300d61f9739c6bb4da0af838e510f1fc0d78be6ea01ec2fa)
       '@tryghost/kg-default-cards':
-        specifier: ^10.1.3
-        version: 10.1.3
+        specifier: ^10.1.5
+        version: 10.1.5
       '@tryghost/kg-default-nodes':
-        specifier: ^1.4.21
-        version: 1.4.21
+        specifier: ^2.0.1
+        version: 2.0.1
       '@tryghost/kg-lexical-html-renderer':
-        specifier: ^1.3.21
-        version: 1.3.21(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))
+        specifier: ^1.3.24
+        version: 1.3.24(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))
       entities:
         specifier: ^4.5.0
         version: 4.5.0
@@ -1710,48 +1710,27 @@ packages:
     resolution: {integrity: sha512-4MGhrW61cWlnPapcXmFeaIDD3hXy9hWNAeyBmBWHR5bQqQyZPADB1Jgm9fR580XdRNLfns/auLaqiOvuyCbyAA==, tarball: file:node_modules/.pnpm-config/ghost/components/tryghost-i18n-6.0.5.tgz}
     version: 6.0.5
 
-  '@tryghost/kg-card-factory@5.1.1':
-    resolution: {integrity: sha512-G01NBCYnX8T+ANF56FuWwfIC+PFecxKTcpvVwclzqh2XmoMylHZlHJDa99dvU+/U4QetRlV2aX9IeyN0ydZTmA==}
-    engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
-
   '@tryghost/kg-card-factory@5.1.2':
     resolution: {integrity: sha512-mrseuYlQMB92NbPQCgN8hnlxYpckkAFEK+3oovoKwUzsOD7WAColt/QCSOZXYKIkKbact7vO11UFAES2fqQOUw==}
-    engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
-
-  '@tryghost/kg-clean-basic-html@4.2.5':
-    resolution: {integrity: sha512-zZ/8OFZFxnj8VUSb+SfeM5ndYTPCzvP3FQjbgy1ziSykA0u7Idv5Rd5hVb3kAh4HhnIUiOQ38dIbm1PqboIcpQ==}
     engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
 
   '@tryghost/kg-clean-basic-html@4.2.7':
     resolution: {integrity: sha512-pScSO2SdMCuPM9o4Vbgaf1AkZjk3Jt6F/VE2v2MZkJ4kv5yA8s74P/muuLR1NKh1y7/YEpoGLPSVTRzU0TrCpQ==}
     engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
 
-  '@tryghost/kg-default-atoms@5.1.0':
-    resolution: {integrity: sha512-DWjZfADkHaQvLuUNKhzYhzSNUXeJrKpw6l22bTDourPTj6bWRrYH3TWePj5/NrrBGpTWQS4aCmlGxifP8tgPKg==}
-    engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
-
-  '@tryghost/kg-default-cards@10.1.3':
-    resolution: {integrity: sha512-Rcq0007fJtC287csNrfxgKEPjufo3DjkdPC7OQTleNnqBz0SwBqymL+EhVg7UoEfN49irpMNgtovLOwXSXT2YA==}
+  '@tryghost/kg-default-atoms@5.1.1':
+    resolution: {integrity: sha512-VeQOz36U6J+ZNcgiDSJI+qu7MO2ORN8YtDsZoFxhH/EilCHAGWBURgv2qfx3AP4ScI4KCx+cBjt6gm+u1aYI5A==}
     engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
 
   '@tryghost/kg-default-cards@10.1.5':
     resolution: {integrity: sha512-S4hnyluGJYaXRkoT8Z3cMuHt2XiA/AO3yYVjYDxBZ+5n3iwlomuMwwqa1sK4I8Yt3MwpdGC0By5tx0xD6vKTTA==}
     engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
 
-  '@tryghost/kg-default-nodes@1.4.21':
-    resolution: {integrity: sha512-k8bkqm7RjiYO9AsJHpVTq060TIoUf8dbiA5jR1IqvdfQ+8WLmB2BA0xf1Qa3lUbm/WaU+Jk4php/gSI/OU32VA==}
-
   '@tryghost/kg-default-nodes@2.0.1':
     resolution: {integrity: sha512-DPO1bvnrnIh7xlHxtnICCbs88qGKeslT0S3MowOtiJ0FG6xRdl1+J0h5JitS38NjQi+HZxSDW75hYdmWvVQfCg==}
 
-  '@tryghost/kg-default-transforms@1.2.21':
-    resolution: {integrity: sha512-QGD0ybQH+fLyY2TyEwQ9O/IFsAT3ZVwb1WwpsuxlFBIOORxdfNMEFA0FiwkehFiTayxOsoP8MZOIrK+G4dKWdg==}
-
   '@tryghost/kg-default-transforms@1.2.24':
     resolution: {integrity: sha512-AgoA7nUqAtsVJiROdA1FXvoNr92cNxEDSY4ndPd7nqXP1K2NHX5hqNYb6C2m2vds7lJKA6aXEFJPs+ddpgWS5w==}
-
-  '@tryghost/kg-lexical-html-renderer@1.3.21':
-    resolution: {integrity: sha512-oLkKP7ozke1fLmXXDz1mLaNSEHfVksfk68ovt4Nx/hR3EAEb873CKy09wlzY0JLaywGf4eA8rNMnA2qEmzSheA==}
 
   '@tryghost/kg-lexical-html-renderer@1.3.24':
     resolution: {integrity: sha512-Cuc4TL9itKhzcpM8FwQdxwQZQeb4Xe164jfJyygmsrkRg7mAwv7iRWmiHVL656nNaIyNFp4nplJxkHEXnLW5FQ==}
@@ -1762,10 +1741,6 @@ packages:
 
   '@tryghost/kg-markdown-html-renderer@7.1.3':
     resolution: {integrity: sha512-1UzWqm9+UK2fxoI0mJwNzUSbUm/weqAo0b1jeFPyU3BRtO+lRYvEWv/X5KQRBqLq6HEih2Qe8H1roTPzUKzxfA==}
-    engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
-
-  '@tryghost/kg-mobiledoc-html-renderer@7.1.2':
-    resolution: {integrity: sha512-fBTOFPRB9m5W1syy9HxowARqf4qfqralBC2Aw06W/BfP1R/ylrvX3MpJ823ijHK4svR2lrUOgZwo5zy6w4ww5w==}
     engines: {node: ^18.12.1 || ^20.11.1 || ^22.13.1}
 
   '@tryghost/kg-mobiledoc-html-renderer@7.1.3':
@@ -1790,9 +1765,6 @@ packages:
 
   '@tryghost/string@0.2.16':
     resolution: {integrity: sha512-WbshTmmJQViKeRVMFXw3pnIzloMUrloyhCbiV0Tfe4E7dkQ1jvZFvMGCttqZYMSSNsU9dhmBVMpT1HcX+EpifQ==}
-
-  '@tryghost/url-utils@4.4.12':
-    resolution: {integrity: sha512-11tlNFymPNoUi3ds2PCuDxgMnHVLw4R6lkeF8vC6EYtYPpjuLaXMCG0PakCj7hTBISatOTvWy0ldm38KUfyaWg==}
 
   '@tryghost/url-utils@4.4.13':
     resolution: {integrity: sha512-OOR1Tkg5ixS1vXfHcohtBvm/JMf3yJa/wi8NoMrlLj4oxf2OZNsXtswtCljF+FsvNC6PduccM3OI900ULoTsDg==}
@@ -2867,8 +2839,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  luxon@3.6.1:
-    resolution: {integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==}
+  luxon@3.7.2:
+    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
     engines: {node: '>=12'}
 
   magic-string@0.30.17:
@@ -5574,25 +5546,11 @@ snapshots:
 
   '@tryghost/i18n@file:node_modules/.pnpm-config/ghost/components/tryghost-i18n-6.0.5.tgz': {}
 
-  '@tryghost/kg-card-factory@5.1.1': {}
-
   '@tryghost/kg-card-factory@5.1.2': {}
-
-  '@tryghost/kg-clean-basic-html@4.2.5': {}
 
   '@tryghost/kg-clean-basic-html@4.2.7': {}
 
-  '@tryghost/kg-default-atoms@5.1.0': {}
-
-  '@tryghost/kg-default-cards@10.1.3':
-    dependencies:
-      '@tryghost/kg-markdown-html-renderer': 7.1.2
-      '@tryghost/string': 0.2.16
-      '@tryghost/url-utils': 4.4.12
-      handlebars: 4.7.8
-      juice: 11.0.1
-      lodash: 4.17.21
-      luxon: 3.6.1
+  '@tryghost/kg-default-atoms@5.1.1': {}
 
   '@tryghost/kg-default-cards@10.1.5':
     dependencies:
@@ -5602,27 +5560,7 @@ snapshots:
       handlebars: 4.7.8
       juice: 11.0.1
       lodash: 4.17.21
-      luxon: 3.6.1
-
-  '@tryghost/kg-default-nodes@1.4.21':
-    dependencies:
-      '@lexical/clipboard': 0.13.1(lexical@0.13.1)
-      '@lexical/rich-text': 0.13.1(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lexical@0.13.1)
-      '@lexical/selection': 0.13.1(lexical@0.13.1)
-      '@lexical/utils': 0.13.1(lexical@0.13.1)
-      '@tryghost/kg-clean-basic-html': 4.2.5
-      '@tryghost/kg-markdown-html-renderer': 7.1.2
-      clsx: 2.1.1
-      html-minifier: 4.0.0
-      jsdom: 24.1.3
-      lexical: 0.13.1
-      lodash: 4.17.21
-      luxon: 3.6.1
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - utf-8-validate
+      luxon: 3.7.2
 
   '@tryghost/kg-default-nodes@2.0.1':
     dependencies:
@@ -5637,23 +5575,8 @@ snapshots:
       jsdom: 24.1.3
       lexical: 0.13.1
       lodash: 4.17.21
-      luxon: 3.6.1
+      luxon: 3.7.2
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - utf-8-validate
-
-  '@tryghost/kg-default-transforms@1.2.21(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))':
-    dependencies:
-      '@lexical/list': 0.13.1(lexical@0.13.1)
-      '@lexical/rich-text': 0.13.1(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lexical@0.13.1)
-      '@lexical/utils': 0.13.1(lexical@0.13.1)
-      '@tryghost/kg-default-nodes': 1.4.21
-      lexical: 0.13.1
-    transitivePeerDependencies:
-      - '@lexical/clipboard'
-      - '@lexical/selection'
       - bufferutil
       - canvas
       - supports-color
@@ -5669,26 +5592,6 @@ snapshots:
     transitivePeerDependencies:
       - '@lexical/clipboard'
       - '@lexical/selection'
-      - bufferutil
-      - canvas
-      - supports-color
-      - utf-8-validate
-
-  '@tryghost/kg-lexical-html-renderer@1.3.21(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))':
-    dependencies:
-      '@lexical/clipboard': 0.13.1(lexical@0.13.1)
-      '@lexical/code': 0.13.1(lexical@0.13.1)
-      '@lexical/headless': 0.13.1(lexical@0.13.1)
-      '@lexical/link': 0.13.1(lexical@0.13.1)
-      '@lexical/list': 0.13.1(lexical@0.13.1)
-      '@lexical/rich-text': 0.13.1(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))(@lexical/utils@0.13.1(lexical@0.13.1))(lexical@0.13.1)
-      '@tryghost/kg-default-nodes': 1.4.21
-      '@tryghost/kg-default-transforms': 1.2.21(@lexical/clipboard@0.13.1(lexical@0.13.1))(@lexical/selection@0.13.1(lexical@0.13.1))
-      jsdom: 24.1.3
-      lexical: 0.13.1
-    transitivePeerDependencies:
-      - '@lexical/selection'
-      - '@lexical/utils'
       - bufferutil
       - canvas
       - supports-color
@@ -5737,12 +5640,6 @@ snapshots:
       markdown-it-sub: 2.0.0
       markdown-it-sup: 2.0.0
       semver: 7.7.2
-
-  '@tryghost/kg-mobiledoc-html-renderer@7.1.2':
-    dependencies:
-      '@tryghost/kg-utils': 1.0.31
-      mobiledoc-dom-renderer: 0.7.0
-      simple-dom: 1.4.0
 
   '@tryghost/kg-mobiledoc-html-renderer@7.1.3':
     dependencies:
@@ -5838,16 +5735,6 @@ snapshots:
   '@tryghost/string@0.2.16':
     dependencies:
       unidecode: 0.1.8
-
-  '@tryghost/url-utils@4.4.12':
-    dependencies:
-      cheerio: 1.0.0
-      lodash: 4.17.21
-      moment: 2.30.1
-      moment-timezone: 0.5.48
-      remark: 11.0.2
-      remark-footnotes: 1.0.0
-      unist-util-visit: 2.0.3
 
   '@tryghost/url-utils@4.4.13':
     dependencies:
@@ -6974,7 +6861,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  luxon@3.6.1: {}
+  luxon@3.7.2: {}
 
   magic-string@0.30.17:
     dependencies:
