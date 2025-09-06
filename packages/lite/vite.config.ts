@@ -10,16 +10,12 @@ const { default: pkg } = (await tsImport(
   "@ghost-render/rollup-plugin-pkg-json",
   import.meta.url
 )) as typeof import("@ghost-render/rollup-plugin-pkg-json");
-import {
-  dependencies,
-  devDependencies,
-  peerDependencies,
-} from "./package.json";
+import { dependencies, devDependencies } from "./package.json";
 import { LITE_MODULES, modulesToEntries } from "./vite-config/modules";
 import makeExternal from "./vite-config/external";
 
 const { deps, bundledDeps, external } = makeExternal({
-  deps: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
+  deps: [...Object.keys(dependencies)],
   bundledDeps: Object.keys(devDependencies),
 });
 // This package will be copied
