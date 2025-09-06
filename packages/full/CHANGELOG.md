@@ -1,5 +1,11 @@
 # @ghost-render/full
 
+## 0.0.4
+
+### Patch Changes
+
+- 79a108a: fix!: update versions of ghost's dependencies
+
 ## 0.0.3
 
 ### Patch Changes
