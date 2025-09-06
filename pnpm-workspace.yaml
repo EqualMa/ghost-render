@@ -1,7 +1,7 @@
 packages:
   - packages/*
 catalog:
-  ghost: 6.0.5
+  ghost: 6.0.7
   juice: ^11.0.0
   cheerio: ^1.0.0
   clsx: ^2.1.1
