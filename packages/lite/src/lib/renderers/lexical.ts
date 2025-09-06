@@ -1,3 +1,5 @@
+/** A lite version of node_modules/ghost/core/server/lib/lexical.js */
+
 import {
   LexicalHtmlRenderer,
   DEFAULT_NODES as nodes,
@@ -5,10 +7,10 @@ import {
 
 import type { Dependencies } from "@ghost-render/email-renderer";
 
+import customNodeRenderers from "@ghost-render/koenig-node-renderers";
+
 export interface RendererLexicalLabs {
-  isSet(
-    key: "contentVisibility" | "emailCustomization" | "emailCustomizationAlpha"
-  ): boolean;
+  isSet(key: "contentVisibility"): boolean;
 }
 
 const lexicalHtmlRenderer = new LexicalHtmlRenderer({
@@ -36,10 +38,9 @@ export default function makeRendererLexical({
           },
           feature: {
             contentVisibility: labs.isSet("contentVisibility"),
-            emailCustomization: labs.isSet("emailCustomization"),
-            emailCustomizationAlpha: labs.isSet("emailCustomizationAlpha"),
+            emailCustomization: true, // force on until Koenig has been bumped
           },
-          nodeRenderers: await getCustomNodeRenderers(labs),
+          nodeRenderers: customNodeRenderers,
         },
         userOptions
       );
@@ -48,51 +49,4 @@ export default function makeRendererLexical({
     },
   };
   return rendererLexical;
-}
-
-async function getCustomNodeRenderers(labs: {
-  isSet(key: "emailCustomizationAlpha" | "emailCustomization"): boolean;
-}) {
-  if (
-    !labs.isSet("emailCustomizationAlpha") &&
-    !labs.isSet("emailCustomization")
-  ) {
-    return undefined;
-  }
-
-  try {
-    const customNodeRenderers = (
-      await import("@ghost-render/koenig-node-renderers")
-    ).default;
-    return customNodeRenderers;
-  } catch (err) {
-    throw new InternalServerError({
-      message: "Unable to render post content",
-      context: "The custom node renderers module could not be required",
-      code: "KOENIG_CUSTOM_NODE_RENDERERS_LOAD_ERROR",
-      err: err,
-    });
-  }
-}
-
-class InternalServerError extends Error {
-  code: string;
-  context: string;
-
-  constructor({
-    message,
-    code,
-    context,
-    err,
-  }: {
-    message: string;
-    context: string;
-    code: string;
-    err: unknown;
-  }) {
-    super(message, { cause: err });
-    this.message = message;
-    this.code = code;
-    this.context = context;
-  }
 }
