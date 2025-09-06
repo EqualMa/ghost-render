@@ -48,9 +48,10 @@ isResolved: ${isResolved}`);
       },
     },
     commonjsOptions: {
-      esmExternals: ["luxon"],
+      esmExternals: ["luxon", "@tryghost/color-utils"],
       strictRequires: "auto",
-      requireReturnsDefault: (id) => (id === "luxon" ? "namespace" : false),
+      requireReturnsDefault: (id) =>
+        id === "luxon" || id === "@tryghost/color-utils" ? "namespace" : false,
     },
   },
 });
