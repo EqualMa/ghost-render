@@ -1,5 +1,14 @@
 # @ghost-render/lite
 
+## 0.0.4
+
+### Patch Changes
+
+- c6083be: fix!: @ghost-render/koenig-node-renderers is now a required dependency
+- 79a108a: fix!: update versions of ghost's dependencies
+- Updated dependencies [79a108a]
+  - @ghost-render/koenig-node-renderers@0.0.3
+
 ## 0.0.3
 
 ### Patch Changes
