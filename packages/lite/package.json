@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "@ghost-render/email-renderer": "workspace:",
-    "handlebars": "^4.7.8",
-    "@tryghost/color-utils": "catalog:",
-    "@tryghost/html-to-plaintext": "^1.0.4",
-    "@tryghost/kg-lexical-html-renderer": "^1.3.24",
-    "@tryghost/kg-default-nodes": "^2.0.1",
-    "@tryghost/kg-default-cards": "^10.1.5",
-    "html5parser": "^2.0.2",
-    "entities": "^4.5.0"
+    "handlebars": "catalog:ghost-dep",
+    "@tryghost/color-utils": "catalog:ghost-dep",
+    "@tryghost/html-to-plaintext": "catalog:ghost-dep",
+    "@tryghost/kg-lexical-html-renderer": "catalog:ghost-dep",
+    "@tryghost/kg-default-nodes": "catalog:ghost-dep",
+    "@tryghost/kg-default-cards": "catalog:ghost-dep",
+    "html5parser": "catalog:ghost-dep",
+    "entities": "catalog:ghost-dep"
   },
   "peerDependencies": {
     "@ghost-render/koenig-node-renderers": "workspace:"

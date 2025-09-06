@@ -2,10 +2,32 @@ packages:
   - packages/*
 catalog:
   ghost: 6.0.7
-  juice: ^11.0.0
-  cheerio: ^1.0.0
-  clsx: ^2.1.1
-  "@tryghost/color-utils": "^0.2.10"
+catalogs:
+  # Overrides
+  ghost-dep-not-sync:
+    juice: ^11.0.0
+    cheerio: ^1.0.0
+  # Keep synced with ghost/package.json
+  ghost-dep:
+    # Sync
+    clsx: ^2.1.1
+    "@tryghost/kg-mobiledoc-html-renderer": "^7.1.3"
+    "@tryghost/kg-card-factory": "^5.1.2"
+    "@tryghost/kg-default-cards": "^10.1.5"
+    "@tryghost/kg-default-atoms": "^5.1.1"
+
+    "luxon": "^3.7.2"
+    "handlebars": "^4.7.8"
+    "@tryghost/color-utils": "^0.2.10"
+    "@tryghost/html-to-plaintext": "^1.0.4"
+    "@tryghost/kg-markdown-html-renderer": "^7.1.3"
+    "@tryghost/kg-clean-basic-html": "^4.2.7"
+    "lodash": "^4.17.21"
+    "@tryghost/kg-lexical-html-renderer": "^1.3.24"
+    "@tryghost/kg-default-nodes": "^2.0.1"
+    "html5parser": "^2.0.2"
+    "entities": "^4.5.0"
+
 configDependencies:
   ghost: "6.0.5+sha512-68jiWSufTHqlqi8cQ27jcS5fAhppVhZhwM3KffI5zqu7ZG74HBkY5bksN+Ii067DX/ZaMYUaFtvsHse4jK41NA=="
 ignoredBuiltDependencies:
@@ -18,10 +40,10 @@ overrides:
   # MAKE SURE API CHANGES ARE NOT BREAKING:
   # - https://github.com/Automattic/juice/releases
   # - https://github.com/cheeriojs/cheerio/releases
-  "@tryghost/kg-default-cards>juice@^10.0.0": "catalog:"
-  ghost>juice@9.1.0: "catalog:"
-  ghost>cheerio@0.22.0: "catalog:"
-  "@tryghost/url-utils>cheerio@^0.22.0": "catalog:"
+  "@tryghost/kg-default-cards>juice@^10.0.0": "catalog:ghost-dep-not-sync"
+  ghost>juice@9.1.0: "catalog:ghost-dep-not-sync"
+  ghost>cheerio@0.22.0: "catalog:ghost-dep-not-sync"
+  "@tryghost/url-utils>cheerio@^0.22.0": "catalog:ghost-dep-not-sync"
   "@tryghost/i18n>i18next": "-"
   ghost>@extractus/oembed-extractor: "-"
   ghost>@faker-js/faker: "-"

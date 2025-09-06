@@ -14,11 +14,11 @@
   },
   "peerDependencies": {
     "ghost": "catalog:",
-    "luxon": "^3.7.1",
-    "handlebars": "^4.7.8",
-    "@tryghost/color-utils": "catalog:",
-    "@tryghost/html-to-plaintext": "^1.0.4",
-    "@tryghost/kg-default-cards": "^10.1.5",
+    "luxon": "catalog:ghost-dep",
+    "handlebars": "catalog:ghost-dep",
+    "@tryghost/color-utils": "catalog:ghost-dep",
+    "@tryghost/html-to-plaintext": "catalog:ghost-dep",
+    "@tryghost/kg-default-cards": "catalog:ghost-dep",
     "@tryghost/i18n": "*"
   },
   "peerDependenciesMeta": {

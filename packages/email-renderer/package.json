@@ -7,9 +7,9 @@
     "linkDirectory": false
   },
   "dependencies": {
-    "juice": "catalog:",
-    "cheerio": "catalog:",
-    "clsx": "catalog:"
+    "juice": "catalog:ghost-dep-not-sync",
+    "cheerio": "catalog:ghost-dep-not-sync",
+    "clsx": "catalog:ghost-dep"
   },
   "scripts": {
     "build": "vite build"

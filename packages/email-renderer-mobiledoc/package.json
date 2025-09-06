@@ -7,10 +7,10 @@
     "linkDirectory": false
   },
   "dependencies": {
-    "@tryghost/kg-mobiledoc-html-renderer": "^7.1.3",
-    "@tryghost/kg-card-factory": "^5.1.2",
-    "@tryghost/kg-default-cards": "^10.1.5",
-    "@tryghost/kg-default-atoms": "^5.1.1"
+    "@tryghost/kg-mobiledoc-html-renderer": "catalog:ghost-dep",
+    "@tryghost/kg-card-factory": "catalog:ghost-dep",
+    "@tryghost/kg-default-cards": "catalog:ghost-dep",
+    "@tryghost/kg-default-atoms": "catalog:ghost-dep"
   },
   "scripts": {
     "build": "vite build"
